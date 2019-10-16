@@ -37,7 +37,7 @@ for i in range(len(lines1)):
     name1 = lines1[i].strip()
     for j in range(len(lines2)):
         name2 = lines2[j].strip()
-        if (G.has_edge(name1, name2)):
+        if G.has_edge(name1, name2):
             cut_nodes1[name1] = 1
             cut_nodes1[name2] = 1
 
@@ -45,79 +45,77 @@ dict_across = {}  # num. edges across the cut
 dict_internal = {}  # num. edges internal to the cut
 
 
-def satisfyCondition2(
-        node1):  # A node v \in G_i has at least one edge connecting to a member of G_i which is not connected to G_j.
+def satisfyCondition2(node1):  # A node v \in G_i has at least one edge connecting to a member of G_i which is not connected to G_j.
     neighbors = G.neighbors(node1)
     for n in neighbors:
-        if (dict_left.has_key(node1) and dict_right.has_key(n)):  # only consider neighbors belonging to G_i
+        if node1 in dict_left and n in dict_right:  # only consider neighbors belonging to G_i
             continue
-        if (dict_right.has_key(node1) and dict_left.has_key(n)):  # only consider neighbors belonging to G_i
+        if node1 in dict_right and n in dict_left:  # only consider neighbors belonging to G_i
             continue
-        if (not cut_nodes1.has_key(n)):
+        if n not in cut_nodes1:
             return True
     return False
 
 
 # remove nodes from the cut that dont satisfy condition 2 - check for condition2 in the paper http://homepages.dcc.ufmg.br/~pcalais/papers/icwsm13-pcalais.pdf page 5,
-for keys in cut_nodes1.keys():
-    if (satisfyCondition2(keys)):
+for keys in list(cut_nodes1.keys()):
+    if satisfyCondition2(keys):
         cut_nodes[keys] = 1
 
 for edge in G.edges():
     #	print edge
     node1 = edge[0]
     node2 = edge[1]
-    if (not cut_nodes.has_key(node1) and (not cut_nodes.has_key(node2))):  # only consider edges involved in the cut
+    if node1 not in cut_nodes and (node2 not in cut_nodes):  # only consider edges involved in the cut
         continue
-    if (cut_nodes.has_key(node1) and cut_nodes.has_key(
-            node2)):  # if both nodes are on the cut and both are on the same side, ignore
-        if (dict_left.has_key(node1) and dict_left.has_key(node2)):
+    if (node1 in cut_nodes and node2 in cut_nodes):  # if both nodes are on the cut and both are on the same side, ignore
+        if node1 in dict_left and node2 in dict_left:
             continue
-        if (dict_right.has_key(node1) and dict_right.has_key(node2)):
+        if (node1 in dict_right and node2 in dict_right):
             continue
-    if (cut_nodes.has_key(node1)):
-        if (dict_left.has_key(node1)):
-            if (dict_left.has_key(node2) and not cut_nodes1.has_key(node2)):
-                if (dict_internal.has_key(node1)):
+    if node1 in cut_nodes:
+        if node1 in dict_left:
+            if (node2 in dict_left and node2 not in cut_nodes1):
+                if node1 in dict_internal:
                     dict_internal[node1] += 1
                 else:
                     dict_internal[node1] = 1
-            elif (dict_right.has_key(node2) and cut_nodes.has_key(node2)):
-                if (dict_across.has_key(node1)):
+            elif (node2 in dict_right and node2 in cut_nodes):
+                if node1 in dict_across:
                     dict_across[node1] += 1
                 else:
                     dict_across[node1] = 1
-        elif (dict_right.has_key(node1)):
-            if (dict_left.has_key(node2) and cut_nodes.has_key(node2)):
-                if (dict_across.has_key(node1)):
+        elif node1 in dict_right:
+            if (node2 in dict_left and node2 in cut_nodes):
+                if node1 in dict_across:
                     dict_across[node1] += 1
                 else:
                     dict_across[node1] = 1
-            elif (dict_right.has_key(node2) and not cut_nodes1.has_key(node2)):
-                if (dict_internal.has_key(node1)):
+            elif (node2 in dict_right and node2 not in cut_nodes1):
+                if node1 in dict_internal:
                     dict_internal[node1] += 1
                 else:
                     dict_internal[node1] = 1
-    if (cut_nodes.has_key(node2)):
-        if (dict_left.has_key(node2)):
-            if (dict_left.has_key(node1) and not cut_nodes1.has_key(node1)):
-                if (dict_internal.has_key(node2)):
+    if node2 in cut_nodes:
+        if node2 in dict_left:
+            if (node1 in dict_left and node1 not in cut_nodes1):
+                if node2 in dict_internal:
                     dict_internal[node2] += 1
                 else:
                     dict_internal[node2] = 1
-            elif (dict_right.has_key(node1) and cut_nodes.has_key(node1)):
-                if (dict_across.has_key(node2)):
+            elif (node1 in dict_right and node1 in cut_nodes):
+                if node2 in dict_across:
                     dict_across[node2] += 1
                 else:
                     dict_across[node2] = 1
-        elif (dict_right.has_key(node2)):
-            if (dict_left.has_key(node1) and cut_nodes.has_key(node1)):
-                if (dict_across.has_key(node2)):
+        elif node2 in dict_right:
+            if (node1 in dict_left and node1 in cut_nodes):
+                if node2 in dict_across:
                     dict_across[node2] += 1
                 else:
                     dict_across[node2] = 1
-            elif (dict_right.has_key(node1) and not cut_nodes1.has_key(node1)):
-                if (dict_internal.has_key(node2)):
+            elif (node1 in dict_right and node1 not in cut_nodes1):
+                if node2 in dict_internal:
                     dict_internal[node2] += 1
                 else:
                     dict_internal[node2] = 1
@@ -127,18 +125,18 @@ for edge in G.edges():
 
 polarization_score = 0.0
 lis1 = []
-for keys in cut_nodes.keys():
-    if (not dict_internal.has_key(keys) or (not dict_across.has_key(keys))):  # for singleton nodes from the cut
+for keys in list(cut_nodes.keys()):
+    if (keys not in dict_internal or (keys not in dict_across)):  # for singleton nodes from the cut
         continue
     if (dict_across[keys] == 0 and dict_internal[keys] == 0):  # theres some problem
         print("wtf")
     #	print dict_internal[keys],dict_across[keys],(dict_internal[keys]*1.0/(dict_internal[keys] + dict_across[keys]) - 0.5),G.degree(keys)
     polarization_score += (dict_internal[keys] * 1.0 / (dict_internal[keys] + dict_across[keys]) - 0.5)
 #	if(polarization_score==0.0):
-#		continue 
-#	lis1.append(polarization_score) 
+#		continue
+#	lis1.append(polarization_score)
 
-polarization_score = polarization_score / len(cut_nodes.keys())
-print("********************" + file2 + "*********************")
-print(polarization_score, "\n")
+polarization_score = polarization_score / len(list(cut_nodes.keys()))
+print(("********************" + file2 + "*********************"))
+print((polarization_score, "\n"))
 # print np.mean(np.asarray(lis1)), np.median(np.asarray(lis1))

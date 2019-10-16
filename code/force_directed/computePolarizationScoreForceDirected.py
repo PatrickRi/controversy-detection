@@ -51,7 +51,7 @@ for i in range(len(lines3)):
     [x, y] = [float(line1_split[1].split(",")[0]), float(line1_split[1].split(",")[1])]
     dict_positions[node] = [x, y]
 
-left_list = dict_left.keys()
+left_list = list(dict_left.keys())
 total_lib_lib = 0.0
 count_lib_lib = 0.0
 avg_lib_lib = 0.0  # average liberal to liberal distance
@@ -66,7 +66,7 @@ for i in range(len(left_list)):
         count_lib_lib += 1.0
 avg_lib_lib = total_lib_lib / count_lib_lib
 
-right_list = dict_right.keys()
+right_list = list(dict_right.keys())
 total_cons_cons = 0.0
 count_cons_cons = 0.0
 avg_cons_cons = 0.0  # average conservative to conservative distance
