@@ -30,7 +30,7 @@ def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
         G.node[n]['currcs'] = 0
         # To numpy matrix
     # This comes from the spares FR layout in nx
-    A = nx.to_scipy_sparse_matrix(G, dtype='f')
+    A = nx.to_scipy_sparse_matrix(G, dtype='f', weight=None)
     nnodes, _ = A.shape
 
     try:
@@ -84,17 +84,16 @@ def forceatlas2_layout(G, iterations=10, linlog=False, pos=None, nohubs=False,
 if __name__ == "__main__":
     ## Read a food web with > 100 nodes
     #    FW = nx.read_edgelist('web.edges', create_using=nx.DiGraph())
-    filename = sys.argv[1]
-    file2 = sys.argv[2]
-    FW = nx.read_weighted_edgelist(filename, create_using=nx.Graph(), delimiter=",")
+    filename = "../../polblogs.gml"
+    file2 = "polblogs"
+    G2 = nx.read_gml("../../polblogs.gml", label='id')
+    FW = nx.Graph(G2)
+    #FW = nx.read_weighted_edgelist(filename, create_using=nx.Graph(), delimiter=",")
     positions = forceatlas2_layout(FW, linlog=False, nohubs=False, iterations=1000)
     #	out = open(file2 + "_positions.txt","w");
-    out = open("follower_network/" + file2 + "_positions.txt", "w")
+    out = open(file2 + "_positions.txt", "w")
     #    print positions
     for keys in positions.keys():
-        try:
-            out.write(keys + "\t" + str(positions[keys][0]) + "," + str(positions[keys][1]) + "\n")
-        except:
-            print("ERROR")
+        out.write(str(keys) + "\t" + str(positions[keys][0]) + "," + str(positions[keys][1]) + "\n")
 #    nx.draw(FW, positions)
 #    plt.show()

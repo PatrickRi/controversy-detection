@@ -6,10 +6,12 @@ import sys, math
 import networkx as nx
 import numpy as np
 
-filename = sys.argv[1]
-file2 = sys.argv[2]
+#filename = sys.argv[1]
+#file2 = sys.argv[2]
+file2 = "polblogs"
 
-G = nx.read_weighted_edgelist(filename, delimiter=",")
+G = nx.read_gml("../../polblogs.gml", label='id')
+#G = nx.read_weighted_edgelist(filename, delimiter=",")
 
 
 def getDistance(pointa, pointb):
@@ -20,7 +22,8 @@ def getDistance(pointa, pointb):
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
-f1 = open("../communities_retweet_networks/community1_" + file2 + ".txt")
+#f1 = open("../communities_retweet_networks/community1_" + file2 + ".txt")
+f1 = open("../../polblogs_left.txt")
 # f1 = open("../communities_follow_networks/community1_" + file2 + ".txt")
 lines1 = f1.readlines()
 dict_left = {}
@@ -29,7 +32,8 @@ for line in lines1:
     line = line.strip()
     dict_left[line] = 1
 
-f2 = open("../communities_retweet_networks/community2_" + file2 + ".txt")
+#f2 = open("../communities_retweet_networks/community2_" + file2 + ".txt")
+f2 = open("../../polblogs_right.txt")
 # f2 = open("../communities_follow_networks/community2_" + file2 + ".txt")
 lines2 = f2.readlines()
 dict_right = {}
@@ -39,7 +43,7 @@ for line in lines2:
     dict_right[line] = 1
 
 # f3 = open("force_directed/" + file2 + "_positions.txt")
-f3 = open("force_directed/follower_network/" + file2 + "_positions.txt")
+f3 = open("polblogs_positions_fai.txt")
 # f3 = open("LinLogLayout/" + file2 + "_positions.txt")
 lines3 = f3.readlines()
 
