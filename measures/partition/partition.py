@@ -7,10 +7,5 @@ import networkx as nx
 class Partition(metaclass=ABCMeta):
 
     @abstractmethod
-    def __init__(self, graph: nx.Graph, node_mapping: dict):
-        self.graph = graph
-        self.node_mapping = node_mapping
-
-    @abstractmethod
-    def partition(self) -> Tuple[list, list]:
+    def partition(self, graph: nx.Graph, node_mapping: dict) -> Tuple[list, list]:
         raise NotImplementedError()

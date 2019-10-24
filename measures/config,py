@@ -1,0 +1,4 @@
+modularity = 'newman'
+partition = 'metis'
+
+dataset_name = 'karate.gml'

@@ -1,0 +1,5 @@
+modularity: newman
+partition: metis
+dataset-path: '../Datasets'
+dataset-name: karate.gml
+partitions-path: '../Partitions'
