@@ -1,5 +1,6 @@
 Creator "Lada Adamic on Tue Aug 15 2006"
 graph [
+  directed 1
   multigraph 1
   node [
     id 1
