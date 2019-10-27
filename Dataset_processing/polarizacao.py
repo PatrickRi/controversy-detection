@@ -14,4 +14,4 @@ for file in files:
         elements = line.split(',')
         G.add_edge(elements[0], elements[1])
     dataset = os.path.basename(file).split('.')[0]
-    nx.write_gml(G, './result/' + dataset + '.gml')
+    nx.write_gml(G, './result/' + str(dataset) + '.gml')
