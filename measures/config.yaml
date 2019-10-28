@@ -1,5 +1,5 @@
-modularity: newman
-partition: metis
-dataset-path: '../Datasets'
-dataset-name: karate.gml
-partitions-path: '../Partitions'
+modularity: newman # modularity algorithm to use
+partition: metis # partition to use (directory from where to take the partitions)
+dataset-path: '../partitioning/datasets' # path to datasets
+dataset-name: polblogs_cc # dataset to use
+partitions-path: '../partitioning'

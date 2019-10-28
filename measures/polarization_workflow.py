@@ -1,19 +1,31 @@
 import networkx as nx
-from measures.utils import normalize_graph, get_config
+
+from measures.MBLB import MBLB
+from measures.GMCK import BoundaryConnectivity
+from measures.measure import Measure
+from measures.utils import normalize_graph, get_config, get_partitions
 from measures.modularity import Modularity
-from measures.partition import get_partitioner, Partition
-from .measure import Measure
+from measures.RWC import RWC
+from typing import List
 import os
-import yaml
 
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
-graph_from_file = nx.read_gml(os.path.join(config['dataset-path'], config['dataset-name']), label='id')
+dataset_name = config['dataset-name']
+graph_from_file = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
+# partitions are normalized too, therefore necessary to achieve matching
 g, node_mapping = normalize_graph(graph_from_file)
 
-partitioner = get_partitioner(config['partition'])
-left_part, right_part = partitioner.partition(g, node_mapping)
+# partitioner = get_partitioner(config['partition'])
+# left_part, right_part = partitioner.partition(g, node_mapping)
+left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
 
-m = Modularity(g, node_mapping, left_part, right_part, config['dataset-name'])
-score = m.calculate()
-print(score)
+measures_list: List[Measure] = [
+    BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+    MBLB(g, node_mapping, left_part, right_part, dataset_name),
+    Modularity(g, node_mapping, left_part, right_part, dataset_name),
+    RWC(g, node_mapping, left_part, right_part, dataset_name)
+
+]
+for m in measures_list:
+    print(m.__class__.__name__, m.calculate())

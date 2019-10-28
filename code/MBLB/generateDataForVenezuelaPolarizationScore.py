@@ -98,8 +98,6 @@ def getNodesFromLabelsWithHighestDegree(G, k, flag):  # first take the nodes wit
 left_seed_nodes = getNodesFromLabelsWithHighestDegree(G, seed_nodes_num, 'left')
 right_seed_nodes = getNodesFromLabelsWithHighestDegree(G, seed_nodes_num, 'right')
 
-G1 = nx.Graph()
-
 dict_ids = {}
 dict_ideos = {}
 

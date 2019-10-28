@@ -1,10 +1,11 @@
 from measures.measure import Measure
 import networkx as nx
+from typing import List
 
 
 class Modularity(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: list, right_part: list, dataset: str,
+    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  algorithm: str = "newman"):
         super().__init__(graph, node_mapping, left_part, right_part, dataset)
         self.algorithm = algorithm
