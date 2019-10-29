@@ -2,7 +2,7 @@ from fa2 import ForceAtlas2
 import networkx as nx
 from typing import Dict, List
 
-
+# https://github.com/bhargavchippada/forceatlas2
 # maybe play around with some parameters (defaults yield results similar to Gephi)
 def force_atlas_fa2(g: nx.Graph, iterations: int) -> Dict[int, List[float]]:
     forceatlas2 = ForceAtlas2(
