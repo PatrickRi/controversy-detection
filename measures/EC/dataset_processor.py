@@ -1,8 +1,10 @@
-import networkx as nx
 import os
-from typing import List, Dict
-from .force_atlas import force_atlas_fa2
 from datetime import datetime
+from typing import Dict, List
+
+import networkx as nx
+
+from .force_atlas import force_atlas_fa2
 
 
 def read_positions_file(path: str) -> Dict[int, List[float]]:
@@ -22,15 +24,16 @@ def create_file(g, target_path) -> Dict[int, List[float]]:
     print('start partitioning')
     start = datetime.now()
     positions = force_atlas_fa2(g, 1000)
-    print('end partitioning', 'took:', (datetime.now()-start).seconds, 'seconds')
+    print('end partitioning', 'took:', (datetime.now() - start).seconds, 'seconds')
     with open(target_path, 'w') as f:
         for keys in positions.keys():
             f.write(str(keys) + "\t" + str(positions[keys][0]) + "," + str(positions[keys][1]) + "\n")
     return positions
 
 
-def get_positions(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int]) -> Dict[int, List[float]]:
-    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'positions', dataset + '_positions_gephi.txt')
+def get_positions(g: nx.Graph, dataset: str) -> Dict[int, List[float]]:
+    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'positions',
+                               dataset + '_positions_gephi.txt')
     if os.path.exists(target_path):
         return read_positions_file(target_path)
     else:

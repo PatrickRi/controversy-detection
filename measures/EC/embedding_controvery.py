@@ -1,7 +1,9 @@
-from measures.measure import Measure
-from typing import Dict, List
-import networkx as nx
 import math
+from typing import Dict, List
+
+import networkx as nx
+
+from measures.measure import Measure
 from .dataset_processor import get_positions
 
 
@@ -11,7 +13,7 @@ class EmbeddingControversy(Measure):
         super().__init__(graph, node_mapping, left_part, right_part, dataset)
 
     def calculate(self) -> float:
-        dict_positions = get_positions(self.graph, self.dataset, self.left_part, self.right_part)
+        dict_positions = get_positions(self.graph, self.dataset)
         # calculate dx and dy and dxy
         avg_left_left = self.calc_avg_distance(self.left_part, self.left_part, dict_positions)
         avg_right_right = self.calc_avg_distance(self.right_part, self.right_part, dict_positions)

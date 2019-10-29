@@ -1,5 +1,6 @@
 import networkx as nx
 
+from measures.BCC import BCC
 from measures.MBLB import MBLB
 from measures.GMCK import BoundaryConnectivity
 from measures.EC import EmbeddingControversy
@@ -22,11 +23,12 @@ g, node_mapping = normalize_graph(graph_from_file)
 left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
 
 measures_list: List[Measure] = [
-    #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-    EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
-    #MBLB(g, node_mapping, left_part, right_part, dataset_name),
-    #Modularity(g, node_mapping, left_part, right_part, dataset_name),
-    #RWC(g, node_mapping, left_part, right_part, dataset_name)
+    BCC(g, node_mapping, left_part, right_part, dataset_name),
+    # BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+    # EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
+    # MBLB(g, node_mapping, left_part, right_part, dataset_name),
+    # Modularity(g, node_mapping, left_part, right_part, dataset_name),
+    # RWC(g, node_mapping, left_part, right_part, dataset_name)
 
 ]
 for m in measures_list:
