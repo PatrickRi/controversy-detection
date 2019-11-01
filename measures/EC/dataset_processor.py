@@ -23,7 +23,7 @@ def read_positions_file(path: str) -> Dict[int, List[float]]:
 def create_file(g, target_path) -> Dict[int, List[float]]:
     print('start partitioning')
     start = datetime.now()
-    positions = force_atlas_fa2(g, 1000)
+    positions = force_atlas_fa2(g, 100)
     print('end partitioning', 'took:', (datetime.now() - start).seconds, 'seconds')
     with open(target_path, 'w') as f:
         for keys in positions.keys():
@@ -33,7 +33,7 @@ def create_file(g, target_path) -> Dict[int, List[float]]:
 
 def get_positions(g: nx.Graph, dataset: str) -> Dict[int, List[float]]:
     target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'positions',
-                               dataset + '_positions_gephi.txt')
+                               dataset + '_positions.txt')
     if os.path.exists(target_path):
         return read_positions_file(target_path)
     else:

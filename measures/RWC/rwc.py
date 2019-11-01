@@ -48,7 +48,7 @@ class RWC(Measure):
                     right_left += 1
                 elif side == "right":
                     right_right += 1
-
+        print(left_left,right_right, left_right, right_left)
         e1 = left_left * 1.0 / (left_left + right_left)
         e2 = left_right * 1.0 / (left_right + right_right)
         e3 = right_left * 1.0 / (left_left + right_left)

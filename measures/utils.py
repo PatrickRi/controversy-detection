@@ -1,8 +1,18 @@
 from typing import Tuple, Dict, List
 import yaml
 import os
+import logging
 
 import networkx as nx
+
+
+def get_logger(name):
+    fmt = '%(asctime)s - %(levelname)s - %(message)s'
+    datefmt = '%Y-%m-%d %H:%M:%S'
+    logging.basicConfig(format=fmt, datefmt=datefmt)
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    return logger
 
 
 # Nodes have arbitrary names, which might be difficult later on, 0:n is much simpler, but dictionary might be needed
