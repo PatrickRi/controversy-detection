@@ -2,7 +2,9 @@ from measures.measure import Measure
 from typing import Dict, List
 import random
 import networkx as nx
-from .rwc_utils import list_to_dict, get_nodes_with_highest_degree
+from .rwc_utils import get_nodes_with_highest_degree
+from ..utils import list_to_dict
+from tqdm import tqdm
 
 
 class RWC(Measure):
@@ -23,7 +25,7 @@ class RWC(Measure):
         left_percent = int(self.percent * len(dict_left.keys()))
         right_percent = int(self.percent * len(dict_right.keys()))
 
-        for j in range(self.iterations):
+        for j in tqdm(range(self.iterations)):
             left_nodes = get_nodes_with_highest_degree(self.graph, left_percent, dict_left)
             right_nodes = get_nodes_with_highest_degree(self.graph, right_percent, dict_right)
             # walks starting from left side

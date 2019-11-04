@@ -1,5 +1,6 @@
 from measures.measure import Measure
 from typing import List, Dict
+from ..utils import list_to_dict
 import networkx as nx
 
 
@@ -7,15 +8,8 @@ class BoundaryConnectivity(Measure):
 
     def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str):
         super().__init__(graph, node_mapping, left_part, right_part, dataset)
-        self.left_dict = self.list_to_dict(left_part)
-        self.right_dict = self.list_to_dict(right_part)
-
-
-    def list_to_dict(self, partition: List[int]) -> Dict[int, int]:
-        result = {}
-        for i in partition:
-            result[i] = 1
-        return result
+        self.left_dict = list_to_dict(left_part)
+        self.right_dict = list_to_dict(right_part)
 
 
     def calculate(self) -> float:

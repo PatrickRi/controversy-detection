@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import networkx as nx
+from .utils import get_logger
 
 
 class Measure(metaclass=ABCMeta):
@@ -11,6 +12,7 @@ class Measure(metaclass=ABCMeta):
         self.left_part = left_part
         self.right_part = right_part
         self.dataset = dataset
+        self.logger = get_logger(self.__class__.__name__)
 
     @abstractmethod
     def calculate(self) -> float:

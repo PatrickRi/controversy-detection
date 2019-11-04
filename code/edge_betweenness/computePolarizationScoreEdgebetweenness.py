@@ -84,32 +84,31 @@ plt.hist(eb_list_all, num_bins, color='green', alpha=0.5, label='All edges')
 plt.hist(eb_list, num_bins, color='red', alpha=0.5, label='Edges on the cut')
 plt.savefig(file2 + '_eb.png')
 #"""
-np.savetxt('list_all.txt', np.array(eb_list_all), fmt='%f')
-np.savetxt('list.txt', np.array(eb_list), fmt='%f')
+#np.savetxt('list_all.txt', np.array(eb_list_all), fmt='%f')
+#np.savetxt('list.txt', np.array(eb_list), fmt='%f')
 
 entropies = []
-for i in range(0, 10000):
-    comparison = random.sample(eb_list_all, len(eb_list))
-    entropies.append(stats.entropy(eb_list, comparison))
-entropy = sum(entropies) / len(entropies)
-print("Entropy: " + str(entropy))
-print("BCC therefore: " + str(1 - math.exp(-1.0*entropy)))
+#for i in range(0, 10000):
+#    comparison = random.sample(eb_list_all, len(eb_list))
+#    entropies.append(stats.entropy(eb_list, comparison))
+#entropy = sum(entropies) / len(entropies)
+#print("Entropy: " + str(entropy))
+#print("BCC therefore: " + str(1 - math.exp(-1.0*entropy)))
 
-kde_sample = KernelDensity().fit(np.array(eb_list).reshape(-1, 1))
-listsamples = kde_sample.sample(10000, 43)
-kde_allsamples = KernelDensity().fit(np.array(eb_list_all).reshape(-1, 1))
-listallsamples = kde_allsamples.sample(10000, 43)
-entropy = stats.entropy(listsamples, listallsamples)
-print("KDE Entropy: " + str(entropy))
-print("BCC therefore: " + str(1 - math.exp(-1.0*entropy)))
-np.linspace
+#kde_sample = KernelDensity().fit(np.array(eb_list).reshape(-1, 1))
+#listsamples = kde_sample.sample(10000, 43)
+#kde_allsamples = KernelDensity().fit(np.array(eb_list_all).reshape(-1, 1))
+#listallsamples = kde_allsamples.sample(10000, 43)
+#entropy = stats.entropy(listsamples, listallsamples)
+#print("KDE Entropy: " + str(entropy))
+#print("BCC therefore: " + str(1 - math.exp(-1.0*entropy)))
 #"""
 num_bins = 20
 # the histogram of the data
-plt.hist(listsamples, num_bins, color='red', alpha=0.5, label='Edges on the cut')
-plt.savefig(file2 + '_kde.png')
-plt.hist(listallsamples, num_bins, color='green', alpha=0.5, label='All edges')
-plt.savefig(file2 + '_kde_all.png')
+#plt.hist(listsamples, num_bins, color='red', alpha=0.5, label='Edges on the cut')
+#plt.savefig(file2 + '_kde.png')
+#plt.hist(listallsamples, num_bins, color='green', alpha=0.5, label='All edges')
+#plt.savefig(file2 + '_kde_all.png')
 #"""
 
 #print(stats.entropy(eb_list, eb_list_all)) #TODO must be same size but how?

@@ -7,12 +7,20 @@ import networkx as nx
 
 
 def get_logger(name):
-    fmt = '%(asctime)s - %(levelname)s - %(message)s'
+    # https://docs.python.org/3/library/logging.html#logrecord-attributes
+    fmt = '%(asctime)s - [%(threadName)s] %(name)s - %(message)s'
     datefmt = '%Y-%m-%d %H:%M:%S'
     logging.basicConfig(format=fmt, datefmt=datefmt)
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     return logger
+
+
+def list_to_dict(partition: List[int]) -> Dict[int, int]:
+    result = {}
+    for i in partition:
+        result[i] = 1
+    return result
 
 
 # Nodes have arbitrary names, which might be difficult later on, 0:n is much simpler, but dictionary might be needed

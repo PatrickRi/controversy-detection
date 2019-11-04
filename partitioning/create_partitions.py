@@ -43,7 +43,7 @@ for file in files:
         g = nx.read_gml(file, label='id')
         g = nx.convert_node_labels_to_integers(g)
         (edgecuts, parts) = pymetis.part_graph(2, adjacency=to_adjacency_list(g))
-        print("RESULT:", parts)
+        # print("RESULT:", parts)
         left, right = metis_to_nodelist(parts)
         write_nodelist_file(os.path.join('./partitioning', 'metis', 'left'), dataset, left)
         write_nodelist_file(os.path.join('./partitioning', 'metis', 'right'), dataset, right)

@@ -1,8 +1,11 @@
-import networkx as nx
-import os
-from typing import List, Dict
-from operator import itemgetter
 import math
+import os
+from operator import itemgetter
+from typing import Dict, List
+
+import networkx as nx
+
+from ..utils import list_to_dict
 
 
 def convert_into_directed(g):
@@ -11,13 +14,6 @@ def convert_into_directed(g):
         node2 = edge[1]
         g.add_edge(node2, node1)
     return g
-
-
-def list_to_dict(partition: List[int]) -> Dict[int, int]:
-    result = {}
-    for i in partition:
-        result[i] = 1
-    return result
 
 
 # first take the nodes with the highest degree, then take the top $k$
@@ -38,12 +34,13 @@ def get_nodes_with_highest_degree(g: nx.Graph, k: int, partition: Dict[int, int]
     return random_nodes
 
 
-def enrich_dataset_with_ideologies(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int]) -> nx.Graph:
+def enrich_dataset_with_ideologies(g: nx.Graph, left_part: List[int], right_part: List[int],
+                                   percent: float) -> nx.Graph:
     g = convert_into_directed(g)
     dict_left = list_to_dict(left_part)
     dict_right = list_to_dict(right_part)
-    left_percent = math.ceil(0.05 * len(dict_left.keys()))
-    right_percent = math.ceil(0.05 * len(dict_right.keys()))
+    left_percent = math.ceil(percent * len(dict_left.keys()))
+    right_percent = math.ceil(percent * len(dict_right.keys()))
 
     left_seed_nodes = get_nodes_with_highest_degree(g, left_percent, dict_left)
     right_seed_nodes = get_nodes_with_highest_degree(g, right_percent, dict_right)
@@ -64,11 +61,13 @@ def enrich_dataset_with_ideologies(g: nx.Graph, dataset: str, left_part: List[in
     return g
 
 
-def get_dataset_with_ideologies(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int]) -> nx.Graph:
-    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'enriched_datasets', dataset + '.gml')
+def get_dataset_with_ideologies(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int],
+                                percent: float) -> nx.Graph:
+    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'enriched_datasets',
+                               dataset + '_' + str(percent * 100) + '.gml')
     if os.path.exists(target_path):
         return nx.read_gml(target_path, label='id')
     else:
-        new_graph = enrich_dataset_with_ideologies(g, dataset, left_part, right_part)
+        new_graph = enrich_dataset_with_ideologies(g, left_part, right_part, percent)
         nx.write_gml(new_graph, target_path)
         return new_graph

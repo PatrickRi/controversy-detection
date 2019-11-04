@@ -1,13 +1,6 @@
 import networkx as nx
-from typing import Dict, List
+from typing import Dict
 from operator import itemgetter
-
-
-def list_to_dict(partition: List[int]) -> Dict[int, int]:
-    result = {}
-    for i in partition:
-        result[i] = 1
-    return result
 
 
 # first take the nodes with the highest degree, then take the top $k$

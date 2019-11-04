@@ -1,27 +1,31 @@
-from measures.measure import Measure
-from typing import Dict, List
+from typing import List
+
 import networkx as nx
 import numpy as np
 import scipy.sparse as sp
-import time
+
+from measures.measure import Measure
 from .dataset_processor import get_dataset_with_ideologies
 
 
 class MBLB(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str):
+    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+                 percent: float = 0.05):
         super().__init__(graph, node_mapping, left_part, right_part, dataset)
+        self.percent = percent
 
     def calculate(self) -> float:
-        g = get_dataset_with_ideologies(self.graph, self.dataset, self.left_part, self.right_part)
+        g = get_dataset_with_ideologies(self.graph, self.dataset, self.left_part, self.right_part, self.percent)
+        self.logger.info('Retrieved datasets with ideologies')
         ideologies = nx.get_node_attributes(g, 'ideo')
         corenode = []
         for key in list(ideologies.keys()):
             if ideologies[key] == 1 or ideologies[key] == -1:
                 corenode.append(key)
-
+        self.logger.info('Creating model')
         v_current = self.model(g, corenode)
-
+        self.logger.info('Calculating Polarization')
         return self.calculate_polarization_index(v_current)
 
     def model(self, g: nx.Graph, corenode: List[int], tol=10 ** -5):
@@ -35,7 +39,7 @@ class MBLB(Measure):
 
         # Build the adjacency matrix
         Aij = sp.lil_matrix((N, N))
-        print("Adjacency matrix shape: " + str(Aij.shape))
+        self.logger.info("Adjacency matrix shape: %s", str(Aij.shape))
         for o, d in g.edges():
             Aij[o, d] = 1
             Aij[d, o] = 1
@@ -52,11 +56,10 @@ class MBLB(Measure):
         v_new = 1. * np.array(v_new)
         notconverged = len(v_current)
         times = 0
-
+        self.logger.info('Starting to converge...')
         # Do as many times as required for convergence
         while notconverged > 0:
             times = times + 1
-            t = time.time()
 
             # for all nodes apart from corenode, calculate opinion as average of neighbors
             for j in np.setdiff1d(list(range(len(v_current))), corenode):
@@ -73,6 +76,8 @@ class MBLB(Measure):
 
             diff = np.abs(v_current - v_new)
             notconverged = len(diff[diff > tol])
+            if times % 5 == 0:
+                self.logger.info('Unconverged: %s after %s times', str(notconverged), times)
             v_current = v_new.copy()
         return v_current
 
@@ -103,5 +108,5 @@ class MBLB(Measure):
         # 0.6969187675070029 0.05882352941176472 0.7404761904761905 0.6969187675070029 0.058823529411764705 0.6969187675070029
         # polblogs_cc:
         # 0.6657809037580392 0.09656301145662849 0.736942268471308 0.6657809037580392 0.09656301145662848 0.6657809037580392
-        #print(p1, DA, D, (1 - DA) * D, abs((AP - AN) / (AP + AN)), (1 - abs((AP - AN) / (AP + AN))) * D)
+        # print(p1, DA, D, (1 - DA) * D, abs((AP - AN) / (AP + AN)), (1 - abs((AP - AN) / (AP + AN))) * D)
         return p1

@@ -1,5 +1,6 @@
 modularity: newman # modularity algorithm to use
 partition: metis # partition to use (directory from where to take the partitions)
 dataset-path: '../partitioning/datasets' # path to datasets
-dataset-name: polblogs_cc # dataset to use
+dataset-name: NY_Teams_Twitter_cc # dataset to use
+normalize: False
 partitions-path: '../partitioning'
