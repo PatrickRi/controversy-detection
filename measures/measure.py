@@ -12,7 +12,7 @@ class Measure(metaclass=ABCMeta):
         self.left_part = left_part
         self.right_part = right_part
         self.dataset = dataset
-        self.logger = get_logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__+'-'+dataset)
 
     @abstractmethod
     def calculate(self) -> float:

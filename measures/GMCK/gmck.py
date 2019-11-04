@@ -94,8 +94,10 @@ class BoundaryConnectivity(Measure):
                 raise Exception("Whoops!")
             polarization_score += (dict_internal[keys] * 1.0 / (dict_internal[keys] + dict_across[keys]) - 0.5)
 
-        polarization_score = polarization_score / len(list(cut_nodes.keys()))
-        return polarization_score
+        if len(list(cut_nodes.keys())) == 0:
+            return 0.0
+        else:
+            return polarization_score / len(list(cut_nodes.keys()))
 
     def satisfy_condition_2(self, g: nx.Graph, node: int,
                             cut_nodes):  # A node v \in G_i has at least one edge connecting to a member of G_i which is not connected to G_j.

@@ -13,10 +13,14 @@ class EmbeddingControversy(Measure):
         super().__init__(graph, node_mapping, left_part, right_part, dataset)
 
     def calculate(self) -> float:
+        self.logger.info('Fetch positions')
         dict_positions = get_positions(self.graph, self.dataset)
         # calculate dx and dy and dxy
+        self.logger.info('Calculate distance left-left')
         avg_left_left = self.calc_avg_distance(self.left_part, self.left_part, dict_positions)
+        self.logger.info('Calculate distance right-right')
         avg_right_right = self.calc_avg_distance(self.right_part, self.right_part, dict_positions)
+        self.logger.info('Calculate distance left-right')
         avg_both = self.calc_avg_distance(self.left_part, self.right_part, dict_positions)
 
         return 1 - ((avg_left_left + avg_right_right) / (2 * avg_both))

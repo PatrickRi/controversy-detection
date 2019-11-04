@@ -8,7 +8,7 @@ import networkx as nx
 
 def get_logger(name):
     # https://docs.python.org/3/library/logging.html#logrecord-attributes
-    fmt = '%(asctime)s - [%(threadName)s] %(name)s - %(message)s'
+    fmt = '%(asctime)s - [%(processName)s] %(name)s - %(message)s'
     datefmt = '%Y-%m-%d %H:%M:%S'
     logging.basicConfig(format=fmt, datefmt=datefmt)
     logger = logging.getLogger(name)
