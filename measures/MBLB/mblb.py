@@ -28,10 +28,10 @@ class MBLB(Measure):
         self.logger.info('Calculating Polarization')
         return self.calculate_polarization_index(v_current)
 
-    def model(self, g: nx.Graph, corenode: List[int], tol=10 ** -5):
+    def model(self, g: nx.Graph, corenodes: List[int], tol=10 ** -3):
         """
         :param g: Graph to calculate opinions. The nodes have an attribute "ideo" with their ideology, set to 0 for all listeners, 1 and -1 for the elite.
-        :param corenode: Nodes that belong to the seed (Identifiers from the Graph G)
+        :param corenodes: Nodes that belong to the seed (Identifiers from the Graph G)
         :param tol: threshold for convergence. It will evaluate the difference between opinions at time t and t+1
         :return: array
         """
@@ -48,7 +48,6 @@ class MBLB(Measure):
         v_new = []
         # dict_nodes = {} # for what are labels needed???
         for nodo in list(g.nodes()):
-            # dict_nodes[G.node[nodo]['label']] = G.node[nodo]['ideo']
             v_current.append(g.nodes[nodo]['ideo'])
             v_new.append(0.0)
 
@@ -58,26 +57,31 @@ class MBLB(Measure):
         times = 0
         self.logger.info('Starting to converge...')
         # Do as many times as required for convergence
+        not_converged_tracker = []
         while notconverged > 0:
             times = times + 1
 
             # for all nodes apart from corenode, calculate opinion as average of neighbors
-            for j in np.setdiff1d(list(range(len(v_current))), corenode):
+            iter_nodes = np.setdiff1d(list(range(len(v_current))), corenodes)
+            for j in iter_nodes:
                 nodosin = Aij.getrow(j).nonzero()[1]
                 if len(nodosin) > 0:
                     v_new[j] = np.mean(v_current[nodosin])
                 else:
                     v_new[j] = v_current[j]
-            #            nodos_changed[j]=nodos_changed[j] or (v_new[j]!=v_current[j])
 
             # update opinion
-            for j in corenode:
+            for j in corenodes:
                 v_new[j] = v_current[j]
 
             diff = np.abs(v_current - v_new)
             notconverged = len(diff[diff > tol])
             if times % 5 == 0:
                 self.logger.info('Unconverged: %s after %s times', str(notconverged), times)
+                not_converged_tracker.append(notconverged)
+                if len(not_converged_tracker) > 5 and np.mean(not_converged_tracker[-3:]) == notconverged:
+                    self.logger.info('No change in 15 iterations, stopping')
+                    notconverged = 0
             v_current = v_new.copy()
         return v_current
 

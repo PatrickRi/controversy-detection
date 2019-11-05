@@ -22,6 +22,7 @@ def read_betweenness_file(path: str) -> Dict[Edge, float]:
 
 def create_file(g, target_path, dataset) -> Dict[Edge, float]:
     # networkx too slow, and sampling is not working as excepted (see dedicated branch)
+    # https://stackoverflow.com/questions/32465503/networkx-never-finishes-calculating-betweenness-centrality-for-2-mil-nodes
     # scores = nx.edge_betweenness_centrality(g, seed=42)
     ig_g: ig.Graph = ig.read('../partitioning/datasets/' + dataset + '.gml')
     ig_g_btwn = ig_g.edge_betweenness(False)
