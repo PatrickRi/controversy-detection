@@ -17,7 +17,7 @@ logger = get_logger('main')
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'Cruzeiro_Atletico_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
+dataset_name = 'connected_complete_graphs'  # 'Cruzeiro_Atletico_Twitter'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
 logger.info('finished reading gml')
