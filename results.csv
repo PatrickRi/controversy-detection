@@ -75,8 +75,10 @@ NY_Teams_Twitter,BCC,0.7589788670113348
 NY_Teams_Twitter,BoundaryConnectivity,0.10819723511378132
 NY_Teams_Twitter,EmbeddingControversy,0.07020193571235589
 NY_Teams_Twitter,MBLB,0.4050231693
+NY_Teams_Twitter,MBLB,0.28113374522282353
 NY_Teams_Twitter,Modularity,0.3937797987
 NY_Teams_Twitter,RWC,0.225893697
+NY_Teams_Twitter,RWC,0.37733071174450983
 NY_Teams_Twitter_cc,BCC,0.7945877984
 NY_Teams_Twitter_cc,BoundaryConnectivity,0.1045194368
 NY_Teams_Twitter_cc,EmbeddingControversy,0.01167137301
