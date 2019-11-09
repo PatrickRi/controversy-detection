@@ -4,6 +4,7 @@ from typing import List
 import networkx as nx
 
 from measures.BCC import BCC
+from measures.CC import ClusteringCoefficient
 from measures.EC import EmbeddingControversy
 from measures.GMCK import BoundaryConnectivity
 from measures.MBLB import MBLB
@@ -17,7 +18,7 @@ logger = get_logger('main')
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'connected_complete_graphs'  # 'Cruzeiro_Atletico_Twitter'
+dataset_name = 'polblogs_cc' #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
 logger.info('finished reading gml')
@@ -47,12 +48,13 @@ else:
     percent = 0.001
 
 measures_list: List[Measure] = [
-    BCC(g, node_mapping, left_part, right_part, dataset_name),
-    BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-    EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
-    MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
-    Modularity(g, node_mapping, left_part, right_part, dataset_name),
-    RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
+    #BCC(g, node_mapping, left_part, right_part, dataset_name),
+    #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+    ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
+    #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
+    #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
+    #Modularity(g, node_mapping, left_part, right_part, dataset_name),
+    #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
 
 ]
 for m in measures_list:

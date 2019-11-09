@@ -8,6 +8,7 @@ import networkx as nx
 from measures.BCC import BCC
 from measures.EC import EmbeddingControversy
 from measures.GMCK import BoundaryConnectivity
+from measures.CC import ClusteringCoefficient
 from measures.MBLB import MBLB
 from measures.measure import Measure
 from measures.modularity import Modularity
@@ -36,13 +37,23 @@ def process_file(file):
     left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
     logger.info('finished loading partitions')
 
+    if g.number_of_nodes() < 100:
+        percent = 0.1
+    elif g.number_of_nodes() < 1000:
+        percent = 0.03
+    elif g.number_of_nodes() < 10000:
+        percent = 0.01
+    else:
+        percent = 0.001
+
     measures_list: List[Measure] = [
         #BCC(g, node_mapping, left_part, right_part, dataset_name),
-        BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
-        #MBLB(g, node_mapping, left_part, right_part, dataset_name),
-        Modularity(g, node_mapping, left_part, right_part, dataset_name),
-        RWC(g, node_mapping, left_part, right_part, dataset_name, percent=0.05)
+        #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+        ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
+        #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
+        #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
+        #Modularity(g, node_mapping, left_part, right_part, dataset_name),
+        #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
     ]
     line = []
     line.append(dataset_name)
