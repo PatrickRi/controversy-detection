@@ -9,12 +9,13 @@ from .dataset_processor import get_positions
 
 class EmbeddingControversy(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset)
+    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+                 cache: bool = True):
+        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
 
     def calculate(self) -> float:
         self.logger.info('Fetch positions')
-        dict_positions = get_positions(self.graph, self.dataset)
+        dict_positions = get_positions(self.graph, self.dataset, self.cache)
         # calculate dx and dy and dxy
         self.logger.info('Calculate distance left-left')
         avg_left_left = self.calc_avg_distance(self.left_part, self.left_part, dict_positions)

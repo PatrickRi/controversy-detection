@@ -11,7 +11,7 @@ class RWC(Measure):
 
     def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  percent: float = 0.10, iterations: int = 1000):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset)
+        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
         self.percent = percent
         self.iterations = iterations
 

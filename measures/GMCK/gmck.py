@@ -7,7 +7,7 @@ import networkx as nx
 class BoundaryConnectivity(Measure):
 
     def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset)
+        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
 

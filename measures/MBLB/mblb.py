@@ -11,12 +11,13 @@ from .dataset_processor import get_dataset_with_ideologies
 class MBLB(Measure):
 
     def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 percent: float = 0.05):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset)
+                 percent: float = 0.05, cache: bool = True):
+        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
         self.percent = percent
 
     def calculate(self) -> float:
-        g = get_dataset_with_ideologies(self.graph, self.dataset, self.left_part, self.right_part, self.percent)
+        g = get_dataset_with_ideologies(self.graph, self.dataset, self.left_part, self.right_part, self.percent,
+                                        self.cache)
         self.logger.info('Retrieved datasets with ideologies')
         ideologies = nx.get_node_attributes(g, 'ideo')
         corenode = []

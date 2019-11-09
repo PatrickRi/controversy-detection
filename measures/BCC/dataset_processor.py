@@ -61,9 +61,9 @@ def rescale_e(betweenness, n, normalized, directed=False, k=None):
     return betweenness
 
 
-def get_centralities(g: nx.Graph, dataset: str) -> Dict[Edge, float]:
+def get_centralities(g: nx.Graph, dataset: str, cache) -> Dict[Edge, float]:
     target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'edge_betweenness', dataset + '.txt')
-    if os.path.exists(target_path):
+    if os.path.exists(target_path) and cache:
         return read_betweenness_file(target_path)
     else:
         return create_file(g, target_path, dataset)

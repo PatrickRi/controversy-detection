@@ -62,10 +62,10 @@ def enrich_dataset_with_ideologies(g: nx.Graph, left_part: List[int], right_part
 
 
 def get_dataset_with_ideologies(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int],
-                                percent: float) -> nx.Graph:
+                                percent: float, cache: bool) -> nx.Graph:
     target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'enriched_datasets',
                                dataset + '_' + str(percent * 100) + '.gml')
-    if os.path.exists(target_path):
+    if os.path.exists(target_path) and cache:
         return nx.read_gml(target_path, label='id')
     else:
         new_graph = enrich_dataset_with_ideologies(g, left_part, right_part, percent)
