@@ -10,6 +10,7 @@ from measures.GMCK import BoundaryConnectivity
 from measures.MBLB import MBLB
 from measures.measure import Measure
 from measures.modularity import Modularity
+from measures.PI import PolarizationIndex
 from measures.RWC import RWC
 from measures.utils import get_config, get_logger, get_partitions, normalize_graph
 
@@ -18,7 +19,7 @@ logger = get_logger('main')
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'polblogs_cc' #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
+dataset_name = 'karate' #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
 logger.info('finished reading gml')
@@ -50,10 +51,11 @@ else:
 measures_list: List[Measure] = [
     #BCC(g, node_mapping, left_part, right_part, dataset_name),
     #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-    ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
+    #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
     #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
     #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
     #Modularity(g, node_mapping, left_part, right_part, dataset_name),
+    PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name),
     #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
 
 ]
