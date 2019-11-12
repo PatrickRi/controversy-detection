@@ -1,6 +1,6 @@
 import os
 from typing import List
-
+import numpy as np
 import networkx as nx
 
 from measures.BCC import BCC
@@ -19,7 +19,7 @@ logger = get_logger('main')
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'karate' #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
+dataset_name = 'polblogs_cc' #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
 logger.info('finished reading gml')
@@ -49,19 +49,22 @@ else:
     percent = 0.001
 
 measures_list: List[Measure] = [
-    #BCC(g, node_mapping, left_part, right_part, dataset_name),
+    BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
     #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
     #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
     #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
     #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
     #Modularity(g, node_mapping, left_part, right_part, dataset_name),
-    PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name),
+    #PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=False),
     #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
 
 ]
-for m in measures_list:
-    logger.info('Start calculating %s', m.__class__.__name__)
-    result = m.__class__.__name__, m.calculate()
-    arr.append(result)
-    print(result)
+for i in range(10):
+    for m in measures_list:
+        logger.info('Start calculating %s', m.__class__.__name__)
+        result = m.__class__.__name__, m.calculate()
+        arr.append(result)
+        print(result)
 print(arr)
+print(np.mean(np.array([x[1] for x in arr])))
+print(np.std(np.array([x[1] for x in arr])))

@@ -4,3 +4,4 @@ dataset-path: '../partitioning/datasets' # path to datasets
 dataset-name: karate # dataset to use
 normalize: False
 partitions-path: '../partitioning'
+cache: False

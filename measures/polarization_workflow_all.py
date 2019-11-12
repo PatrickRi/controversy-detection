@@ -2,9 +2,11 @@ import glob
 import os
 from multiprocessing import Pool
 from typing import List
-
+import pandas as pd
+import numpy as np
 import networkx as nx
 
+from measures.PI import PolarizationIndex
 from measures.BCC import BCC
 from measures.EC import EmbeddingControversy
 from measures.GMCK import BoundaryConnectivity
@@ -45,24 +47,29 @@ def process_file(file):
         percent = 0.01
     else:
         percent = 0.001
-
+    cache = config['cache']
     measures_list: List[Measure] = [
-        #BCC(g, node_mapping, left_part, right_part, dataset_name),
-        #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+        BCC(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
+        BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
         ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
-        #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name),
-        #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
-        #Modularity(g, node_mapping, left_part, right_part, dataset_name),
-        #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
+        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
+        PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
+        MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=cache),
+        Modularity(g, node_mapping, left_part, right_part, dataset_name),
+        RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
     ]
-    line = []
-    line.append(dataset_name)
+    result_arr = []
     for m in measures_list:
+        line = []
+        line.append(dataset_name)
         logger.info('Calculating ' + m.__class__.__name__ + ' for %s', dataset_name)
         result = m.calculate()
+        line.append(m.__class__.__name__)
         line.append(result)
+        result_arr.append(line)
         logger.info('Result for ' + m.__class__.__name__ + ' and dataset ' + dataset_name + ': ' + str(result))
-    return line
+    logger.info('RESULT:' + str(result_arr))
+    return result_arr
 
 
 if __name__ == '__main__':
@@ -70,8 +77,17 @@ if __name__ == '__main__':
     arr = []
     config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
     files = glob.glob(os.path.join(config['dataset-path'], '*.gml'))
+    files = [f for f in files if 'NY_Teams' not in f]
+    # for f in files:
+    #     if 'NY_Teams' in f:
+    #         files.remove(f)
     p = Pool(10)
-    res = p.map(process_file, files)
+    res = p.map(process_file, list(reversed(files)))
+    df = pd.DataFrame(data=[], columns=['dataset', 'measure', 'result'])
+    for l in res:
+        for ll in l:
+            df.loc[len(df)] = ll
+    df.index.name = 'idx'
+    df.to_csv(r'outputr.csv')
     print(res)
-    # dfcsv = pd.DataFrame(data=arr, columns=['dataset', 'GMCK', 'EC', 'MBLB', 'Modularity', 'RWC'])
-    # dfcsv.to_csv(r'output.csv')
+
