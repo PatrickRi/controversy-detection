@@ -1,8 +1,9 @@
 import os
 import random
+
 import networkx as nx
-from tqdm import tqdm
 import numpy as np
+from tqdm import tqdm
 
 
 def construct_H(g: nx.Graph, number_nodes: int, logger) -> nx.Graph:
@@ -20,9 +21,9 @@ def construct_H(g: nx.Graph, number_nodes: int, logger) -> nx.Graph:
     return H
 
 
-def perform_random_walk(starting_node: int, H: nx.Graph) -> int:
+def perform_random_walk(starting_node: int, adj) -> int:
     while True:
-        neighbors = list(H.neighbors(starting_node))
+        neighbors = list(adj[starting_node])
         if len(neighbors) == 0:
             return starting_node
         random_num = random.randint(0, len(neighbors) - 1)
@@ -33,12 +34,14 @@ def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarr
     logger.info('Performing random walks')
     hnn = H.number_of_nodes()
     Q = np.zeros((hnn, hnn))
+    adj_map = H.adj  # faster for degree
     for i in tqdm(range(iterations)):
         Q_curr = np.zeros((hnn, hnn))
         for n in g:
-            for itr in range(nx.degree(g, n) * 2):
-                end = perform_random_walk(n, H)
-                Q_curr[n, end] = Q_curr[n, end] + 1 / iterations
+            node_itrs = len(adj_map[n]) * 2
+            for itr in range(node_itrs):
+                end = perform_random_walk(n, adj_map)
+                Q_curr[n, end] = Q_curr[n, end] + 1 / node_itrs
         Q = Q + Q_curr / iterations
     return Q
 

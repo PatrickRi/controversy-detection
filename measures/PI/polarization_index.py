@@ -1,16 +1,18 @@
 from typing import List
+
 import networkx as nx
 import numpy as np
+
 from measures.measure import Measure
-from ..utils import list_to_dict
 from .dataset_processor import get_probability_matrix
+from ..utils import list_to_dict
 
 
 class PolarizationIndex(Measure):
 
     def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 iterations: int = 10):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
+                 iterations: int = 5, cache: bool = True):
+        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
         self.number_nodes = self.graph.number_of_nodes()
