@@ -1,28 +1,56 @@
 import os
-from typing import List
-
+import random
 import networkx as nx
+from tqdm import tqdm
+import numpy as np
 
 
-def convert_into_directed(g):
-    for edge in g.edges():
-        node1 = edge[0]
-        node2 = edge[1]
-        g.add_edge(node2, node1)
-    return g
+def construct_H(g: nx.Graph, number_nodes: int, logger) -> nx.Graph:
+    logger.info('Constructing H')
+    X = nx.Graph()
+    nodes_offset = number_nodes
+    logger.info('Adding nodes to H')
+    for n in g:
+        X.add_node(n + nodes_offset)
+    H = nx.compose(g, X)
+    H = nx.DiGraph(H)
+    logger.info('Adding edges to H')
+    for n in g:
+        H.add_edge(n, n + nodes_offset)
+    return H
 
 
-def enrich_dataset_with_opinions(g: nx.Graph, left_part: List[int], right_part: List[int]) -> nx.Graph:
-    return g
+def perform_random_walk(starting_node: int, H: nx.Graph) -> int:
+    while True:
+        neighbors = list(H.neighbors(starting_node))
+        if len(neighbors) == 0:
+            return starting_node
+        random_num = random.randint(0, len(neighbors) - 1)
+        starting_node = neighbors[random_num]
 
 
-def get_dataset_with_opinions(g: nx.Graph, dataset: str, left_part: List[int], right_part: List[int],
-                              cache: bool) -> nx.Graph:
-    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'enriched_datasets',
-                               dataset + '.gml')
+def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarray:
+    logger.info('Performing random walks')
+    hnn = H.number_of_nodes()
+    Q = np.zeros((hnn, hnn))
+    for i in tqdm(range(iterations)):
+        Q_curr = np.zeros((hnn, hnn))
+        for n in g:
+            for itr in range(nx.degree(g, n) * 2):
+                end = perform_random_walk(n, H)
+                Q_curr[n, end] = Q_curr[n, end] + 1 / iterations
+        Q = Q + Q_curr / iterations
+    return Q
+
+
+def get_probability_matrix(g: nx.Graph, dataset: str, iterations: int, number_nodes: int, logger,
+                           cache: bool) -> np.ndarray:
+    target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'matrices',
+                               dataset + '_' + str(iterations) + '.npy')
     if os.path.exists(target_path) and cache:
-        return nx.read_gml(target_path, label='id')
+        return np.load(target_path)
     else:
-        new_graph = enrich_dataset_with_opinions(g, left_part, right_part)
-        nx.write_gml(new_graph, target_path)
-        return new_graph
+        H = construct_H(g, number_nodes, logger)
+        Q = random_walk_Q(H, g, iterations, logger)
+        np.save(target_path, Q)
+        return Q
