@@ -32,15 +32,16 @@ def perform_random_walk(starting_node: int, adj) -> int:
 
 def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarray:
     logger.info('Performing random walks')
-    hnn = H.number_of_nodes()
-    Q = np.zeros((hnn, hnn))
+    gnn = g.number_of_nodes()
+    Q = np.zeros((gnn, gnn))
     adj_map = H.adj  # faster for degree
     for i in tqdm(range(iterations)):
-        Q_curr = np.zeros((hnn, hnn))
+        Q_curr = np.zeros((gnn, gnn))
         for n in g:
             node_itrs = len(adj_map[n]) * 2
             for itr in range(node_itrs):
                 end = perform_random_walk(n, adj_map)
+                end = end-gnn
                 Q_curr[n, end] = Q_curr[n, end] + 1 / node_itrs
         Q = Q + Q_curr / iterations
     return Q

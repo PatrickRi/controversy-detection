@@ -3,9 +3,10 @@ import os
 from multiprocessing import Pool
 from typing import List
 import pandas as pd
+from datetime import datetime
 import numpy as np
 import networkx as nx
-
+import traceback
 from measures.PI import PolarizationIndex
 from measures.BCC import BCC
 from measures.EC import EmbeddingControversy
@@ -27,7 +28,7 @@ def process_file(file):
     logger.info('finished reading gml')
     # partitions are normalized too, therefore necessary to achieve matching
     config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
-    if config['normalize']:
+    if config['normalize'] or not graph_from_file.has_node(0):
         g, node_mapping = normalize_graph(graph_from_file)
     else:
         g: nx.Graph = graph_from_file
@@ -60,14 +61,21 @@ def process_file(file):
     ]
     result_arr = []
     for m in measures_list:
-        line = []
-        line.append(dataset_name)
-        logger.info('Calculating ' + m.__class__.__name__ + ' for %s', dataset_name)
-        result = m.calculate()
-        line.append(m.__class__.__name__)
-        line.append(result)
-        result_arr.append(line)
-        logger.info('Result for ' + m.__class__.__name__ + ' and dataset ' + dataset_name + ': ' + str(result))
+        try:
+            line = []
+            line.append(dataset_name)
+            logger.info('Calculating ' + m.__class__.__name__ + ' for %s', dataset_name)
+            start = datetime.now()
+            result = m.calculate()
+            duration = (datetime.now() - start).seconds
+            line.append(m.__class__.__name__)
+            line.append(result)
+            line.append(duration)
+            result_arr.append(line)
+            logger.info('Result for ' + m.__class__.__name__ + ' and dataset ' + dataset_name + ': ' + str(result))
+        except Exception as e:
+            print('ERROR at', m.__class__.__name__, 'and dataset', dataset_name, str(e))
+            traceback.print_tb(e.__traceback__)
     logger.info('RESULT:' + str(result_arr))
     return result_arr
 
@@ -81,13 +89,13 @@ if __name__ == '__main__':
     # for f in files:
     #     if 'NY_Teams' in f:
     #         files.remove(f)
-    p = Pool(10)
-    res = p.map(process_file, list(reversed(files)))
-    df = pd.DataFrame(data=[], columns=['dataset', 'measure', 'result'])
+    p = Pool(5)
+    res = p.map(process_file, files) #list(reversed(files))
+    df = pd.DataFrame(data=[], columns=['dataset', 'measure', 'result', 'duration'])
     for l in res:
         for ll in l:
             df.loc[len(df)] = ll
     df.index.name = 'idx'
-    df.to_csv(r'outputr.csv')
+    df.to_csv(r'output' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv')
     print(res)
 

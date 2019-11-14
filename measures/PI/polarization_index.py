@@ -33,10 +33,5 @@ class PolarizationIndex(Measure):
         z_rw = np.zeros(self.number_nodes)
         for i in range(self.number_nodes):
             row = Q[i]
-            psum = 0
-            for j in range(self.number_nodes):
-                p = row[j + self.number_nodes]
-                si = s[j]
-                psum = psum + p * si
-            z_rw[i] = psum
+            z_rw[i] = np.sum(row * s)
         return (np.linalg.norm(z_rw) ** 2) / self.number_nodes
