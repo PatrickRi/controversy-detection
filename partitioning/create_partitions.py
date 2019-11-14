@@ -41,6 +41,7 @@ for file in files:
         print("processing", file)
         dataset = os.path.basename(file).split('.')[0]
         g = nx.read_gml(file, label='id')
+        g = nx.Graph(g)
         g = nx.convert_node_labels_to_integers(g)
         (edgecuts, parts) = pymetis.part_graph(2, adjacency=to_adjacency_list(g))
         # print("RESULT:", parts)
