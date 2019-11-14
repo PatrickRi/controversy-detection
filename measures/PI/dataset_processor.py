@@ -1,6 +1,6 @@
 import os
 import random
-
+import h5py
 import networkx as nx
 import numpy as np
 from tqdm import tqdm
@@ -33,16 +33,20 @@ def perform_random_walk(starting_node: int, adj) -> int:
 def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarray:
     logger.info('Performing random walks')
     gnn = g.number_of_nodes()
-    Q = np.zeros((gnn, gnn))
+    f = h5py.File("./cache.hdf5", "w")
+    Q = f.create_dataset("Q", (gnn, gnn), compression="gzip")
+    logger.info('H5 file created')
+    #Q = np.zeros((gnn, gnn))
     adj_map = H.adj  # faster for degree
-    for i in tqdm(range(iterations)):
-        for n in g:
+    for i in tqdm(range(iterations), position=0):
+        for j, n in tqdm(enumerate(g), position=1):
             node_itrs = len(adj_map[n]) * 2
             for itr in range(node_itrs):
                 end = perform_random_walk(n, adj_map)
                 end = end - gnn
                 Q[n, end] = Q[n, end] + 1 / node_itrs
-    Q = Q / iterations
+    for i in range(len(Q)):
+        Q[i] = Q[i] / iterations
     return Q
 
 
@@ -55,5 +59,5 @@ def get_probability_matrix(g: nx.Graph, dataset: str, iterations: int, number_no
     else:
         H = construct_H(g, number_nodes, logger)
         Q = random_walk_Q(H, g, iterations, logger)
-        np.save(target_path, Q)
+        #np.save(target_path, Q)
         return Q
