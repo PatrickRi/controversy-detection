@@ -90,9 +90,9 @@ class MBLB(Measure):
         # Input: Vector with individuals Xi
         # Output: Polarization index, Area Difference, Normalized Pole Distance
         D = []  # POLE DISTANCE
-        AP = []  # POSSITIVE AREA
+        AP = []  # POSITIVE AREA
         AN = []  # NEGATIVE AREA
-        cgp = []  # POSSITIVE GRAVITY CENTER
+        cgp = []  # POSITIVE GRAVITY CENTER
         cgn = []  # NEGATIVE GRAVITY CENTER
 
         ideos.sort()
@@ -108,7 +108,7 @@ class MBLB(Measure):
         p1 = 0.5 * D * (1. - 1. * abs(AP0 - AN0))  # polarization index
         DA = 1. * abs(AP0 - AN0) / (AP0 + AN0)  # Areas Difference
         D = 0.5 * D  # Normalized Pole Distance
-        # it seems: 1 = 4 = 6 and 2 = 5
+        # 1 = 4 = 6 and 2 = 5
         # e.g. for karate_easley:
         # 0.6969187675070029 0.05882352941176472 0.7404761904761905 0.6969187675070029 0.058823529411764705 0.6969187675070029
         # polblogs_cc:
