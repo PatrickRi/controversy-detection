@@ -6,5 +6,7 @@ import umap
 
 def umap_ec(g: nx.Graph, s) -> Dict[int, List[float]]:
     reducer = umap.UMAP()
-    embedding = reducer.fit_transform(nx.to_numpy_array(g), s)
+    # using the partitioning vector as target, leads to extreme results (information leak)
+    #embedding = reducer.fit_transform(nx.to_numpy_array(g), s)
+    embedding = reducer.fit_transform(nx.to_numpy_array(g))
     return dict(zip(g.nodes(), embedding))
