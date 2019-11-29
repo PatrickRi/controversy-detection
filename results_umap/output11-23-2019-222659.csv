@@ -1,0 +1,11 @@
+idx,dataset,measure,result,duration
+0,polblogs,EmbeddingControversy,0.550153391156672,16
+1,Cruzeiro_Atletico_Twitter,EmbeddingControversy,0.12164062198381487,1999
+2,connected_complete_graphs,EmbeddingControversy,0.9526302537019955,7
+3,Facebook_Friends_cc,EmbeddingControversy,0.1602787878356371,1
+4,complete_graph_600,EmbeddingControversy,0.08419286004031978,7
+5,karate,EmbeddingControversy,0.698405555914104,0
+6,karate_easley_groundtruth,EmbeddingControversy,0.7287715204305245,0
+7,polblogs_cc,EmbeddingControversy,0.3324333132160283,8
+8,Cruzeiro_Atletico_Twitter_cc,EmbeddingControversy,0.12434197311308814,1151
+9,Facebook_Friends,EmbeddingControversy,0.06906827312813268,1
