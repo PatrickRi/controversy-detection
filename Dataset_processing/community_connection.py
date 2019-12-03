@@ -28,17 +28,21 @@ graphs = {'following': following,
           'ignoring': ignoring,
           'follow_ignore': follow_ignore}
 for k, v in graphs.items():
+    print(k, 'contains',len(list(nx.selfloop_edges(v))), 'selfloop edges')
+    v.remove_edges_from(nx.selfloop_edges(v))
     nx.write_gml(v, './derstandard/' + k + '.gml')
 
 # check if necessary
 #
+
 #     # additionally generate a second dataset, containing only the connected component
-#     ccs = list(nx.connected_components(v))
-#     if len(ccs) > 1:
-#         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
-#         print('Creating second dataset for', k, 'containing only the largest CC')
-#         print('Largest CC has size', lengths[0], 'which is ' + str((lengths[0] / v.number_of_nodes()) * 100),
-#               '% of the dataset')
-#         largest_cc = max(ccs, key=len)
-#         S = v.subgraph(largest_cc).copy()
-#         nx.write_gml(S, './derstandard/' + k + '_cc.gml')
+for k, g in graphs.items():
+    ccs = list(nx.weakly_connected_components(g))
+    if len(ccs) > 1:
+        lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
+        print('Creating second dataset for', k, 'containing only the largest CC')
+        print('Largest CC has size', lengths[0], 'which is ' + str((lengths[0] / g.number_of_nodes()) * 100),
+              '% of the dataset')
+        largest_cc = max(ccs, key=len)
+        S = g.subgraph(largest_cc).copy()
+        nx.write_gml(S, './derstandard/' + k + '_cc.gml')
