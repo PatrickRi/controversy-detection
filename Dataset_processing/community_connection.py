@@ -41,7 +41,10 @@ for k, g in graphs.items():
     if len(ccs) > 1:
         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
         print('Creating second dataset for', k, 'containing only the largest CC')
+        print('Number of edges',len(list(g.edges)))
         print('Largest CC has size', lengths[0], 'which is ' + str((lengths[0] / g.number_of_nodes()) * 100),
+              '% of the dataset')
+        print('Second largest CC has size', lengths[1], 'which is ' + str((lengths[1] / g.number_of_nodes()) * 100),
               '% of the dataset')
         largest_cc = max(ccs, key=len)
         S = g.subgraph(largest_cc).copy()
