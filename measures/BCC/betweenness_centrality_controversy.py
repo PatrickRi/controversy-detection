@@ -1,5 +1,5 @@
 from typing import List
-
+import igraph as ig
 import networkx as nx
 import numpy as np
 from scipy.stats import entropy
@@ -12,16 +12,16 @@ from ..utils import list_to_dict
 
 class BCC(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 cache: bool = True, bandwidth: float = 0.0000001):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int],
+                 right_part: List[int], dataset: str, cache: bool = True, bandwidth: float = 0.0000001):
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.bandwidth = bandwidth
         self.left_dict = list_to_dict(self.left_part)
         self.right_dict = list_to_dict(self.right_part)
 
     def calculate(self) -> float:
         self.logger.info('Retrieve centralities')
-        dict_edge_betweenness = get_centralities(self.graph, self.dataset, self.cache)
+        dict_edge_betweenness = get_centralities(self.graph, self.iggraph, self.dataset, self.cache)
 
         self.logger.info('Split lists')
         eb_list = []

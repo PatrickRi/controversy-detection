@@ -20,19 +20,18 @@ def read_betweenness_file(path: str) -> Dict[Edge, float]:
     return dict_edge_betweenness
 
 
-def create_file(g, target_path, dataset) -> Dict[Edge, float]:
+def create_file(g, iggraph, target_path, dataset) -> Dict[Edge, float]:
     # networkx too slow, and sampling is not working as excepted (see dedicated branch)
     # https://stackoverflow.com/questions/32465503/networkx-never-finishes-calculating-betweenness-centrality-for-2-mil-nodes
     # scores = nx.edge_betweenness_centrality(g, seed=42)
-    ig_g: ig.Graph = ig.read('../partitioning/datasets/' + dataset + '.gml')
-    ig_g_btwn = ig_g.edge_betweenness(False)
+    ig_g_btwn = iggraph.edge_betweenness(False)
     scl_igg = rescale_e(ig_g_btwn, len(g), True, g.is_directed())  # rescale like networkx
     if not g.is_directed():
         scores = [x * 2 for x in scl_igg]  # values of networkx are twice as high
     else:
         scores = scl_igg
     dict_edge_betweenness: Dict[Edge, float] = {}
-    for t, v in zip(ig_g.get_edgelist(), scores):
+    for t, v in zip(iggraph.get_edgelist(), scores):
         dict_edge_betweenness[Edge(t[0], t[1])] = v
     with open(target_path, 'w') as f:
         for key, value in dict_edge_betweenness.items():
@@ -61,9 +60,9 @@ def rescale_e(betweenness, n, normalized, directed=False, k=None):
     return betweenness
 
 
-def get_centralities(g: nx.Graph, dataset: str, cache) -> Dict[Edge, float]:
+def get_centralities(g: nx.Graph, iggraph: ig.Graph, dataset: str, cache) -> Dict[Edge, float]:
     target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'edge_betweenness', dataset + '.txt')
     if os.path.exists(target_path) and cache:
         return read_betweenness_file(target_path)
     else:
-        return create_file(g, target_path, dataset)
+        return create_file(g, iggraph, target_path, dataset)

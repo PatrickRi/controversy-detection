@@ -6,13 +6,14 @@ import numpy as np
 
 from measures.measure import Measure
 from .dataset_processor import get_positions
+import igraph as ig
 
 
 class EmbeddingControversy(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 embedding: str = 'fa', plot: bool = False, cache: bool = True):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int],
+                 right_part: List[int], dataset: str, embedding: str = 'fa', plot: bool = False, cache: bool = True):
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.embedding = embedding
         self.plot = plot
 

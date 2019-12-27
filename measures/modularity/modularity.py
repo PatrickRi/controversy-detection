@@ -5,19 +5,21 @@ from typing import List
 from ..utils import list_to_dict
 import igraph as ig
 import os
+import igraph as ig
 
 
 class Modularity(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int],
+                 right_part: List[int], dataset: str,
                  algorithm: str = "newman"):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, True)
         self.algorithm = algorithm
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
 
     def calculate(self) -> float:
-        if self.algorithm == "newman_slow": # traditional self-implementation
+        if self.algorithm == "newman_slow":  # traditional self-implementation
             return self.newman()
         elif self.algorithm == 'newman':
             return self.newman_igraph()
@@ -30,9 +32,8 @@ class Modularity(Measure):
         for n in self.right_part:
             arr[n] = 1
         self.logger.info('Start reading gml')
-        ig_g: ig.Graph = ig.read('../partitioning/datasets/'+self.dataset+'.gml')
         self.logger.info('Start calc Modularity')
-        r = ig_g.modularity(membership=arr)
+        r = self.iggraph.modularity(membership=arr)
         self.logger.info('Finished calc Modularity')
         return r
 
@@ -60,4 +61,4 @@ class Modularity(Measure):
 
     def __kronecker_delta(self, node_i, node_j):
         return (node_i in self.left_dict and node_j in self.left_dict) or (
-                    node_i in self.right_dict and node_j in self.right_dict)
+                node_i in self.right_dict and node_j in self.right_dict)

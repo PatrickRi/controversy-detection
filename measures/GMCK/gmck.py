@@ -2,15 +2,16 @@ from measures.measure import Measure
 from typing import List, Dict
 from ..utils import list_to_dict
 import networkx as nx
+import igraph as ig
 
 
 class BoundaryConnectivity(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int],
+                 right_part: List[int], dataset: str):
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, True)
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
-
 
     def calculate(self) -> float:
         cut_nodes1 = {}

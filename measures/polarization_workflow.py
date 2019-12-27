@@ -12,7 +12,7 @@ from measures.measure import Measure
 from measures.modularity import Modularity
 from measures.PI import PolarizationIndex
 from measures.RWC import RWC
-from measures.utils import get_config, get_logger, get_partitions, normalize_graph
+from measures.utils import get_config, get_logger, get_partitions, normalize_graph, get_node_percentage
 
 logger = get_logger('main')
 
@@ -39,14 +39,7 @@ logger.info('finished normalizing')
 left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
 logger.info('finished loading partitions')
 arr = []
-if g.number_of_nodes() < 100:
-    percent = 0.1
-elif g.number_of_nodes() < 1000:
-    percent = 0.03
-elif g.number_of_nodes() < 10000:
-    percent = 0.01
-else:
-    percent = 0.001
+percent = get_node_percentage(g.number_of_nodes())
 
 measures_list: List[Measure] = [
     #BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),

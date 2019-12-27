@@ -6,6 +6,17 @@ import logging
 import networkx as nx
 
 
+def get_node_percentage(number_of_nodes: int):
+    if number_of_nodes < 100:
+        return 0.1
+    elif number_of_nodes < 1000:
+        return 0.03
+    elif number_of_nodes < 10000:
+        return 0.01
+    else:
+        return 0.001
+
+
 def get_logger(name):
     # https://docs.python.org/3/library/logging.html#logrecord-attributes
     fmt = '%(asctime)s - [%(processName)s] %(name)s - %(message)s'
