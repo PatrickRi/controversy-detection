@@ -24,6 +24,6 @@ def force_atlas_fa2(g: nx.Graph, iterations: int) -> Dict[int, List[float]]:
         gravity=1.0,
 
         # Log
-        verbose=True)
+        verbose=False)
 
     return forceatlas2.forceatlas2_networkx_layout(g, pos=None, iterations=iterations)

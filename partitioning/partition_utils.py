@@ -27,4 +27,4 @@ def write_nodelist_file(directory_path, dataset, nodes):
     with open(target_path, 'w') as f:
         for item in nodes:
             f.write("%s\n" % item)
-    print(str(target_path) + " written")
+    #print(str(target_path) + " written")
