@@ -29,7 +29,7 @@ class MBLB(Measure):
         self.logger.info('Calculating Polarization')
         return self.calculate_polarization_index(v_current)
 
-    def model(self, g: nx.Graph, corenodes: List[int], tol=10 ** -3):
+    def model(self, g: nx.Graph, corenodes: List[int], tol=10 ** -4):
         """
         :param g: Graph to calculate opinions. The nodes have an attribute "ideo" with their ideology, set to 0 for all listeners, 1 and -1 for the elite.
         :param corenodes: Nodes that belong to the seed (Identifiers from the Graph G)
@@ -47,7 +47,6 @@ class MBLB(Measure):
         # Build the vectors with users opinions
         v_current = []
         v_new = []
-        # dict_nodes = {} # for what are labels needed???
         for nodo in list(g.nodes()):
             v_current.append(g.nodes[nodo]['ideo'])
             v_new.append(0.0)
@@ -80,8 +79,8 @@ class MBLB(Measure):
             if times % 5 == 0:
                 self.logger.info('Unconverged: %s after %s times', str(notconverged), times)
                 not_converged_tracker.append(notconverged)
-                if len(not_converged_tracker) > 5 and np.mean(not_converged_tracker[-3:]) == notconverged:
-                    self.logger.info('No change in 15 iterations, stopping')
+                if len(not_converged_tracker) > 100 and np.mean(not_converged_tracker[-3:]) == notconverged:
+                    self.logger.info('No change in 500 iterations, stopping')
                     notconverged = 0
             v_current = v_new.copy()
         return v_current

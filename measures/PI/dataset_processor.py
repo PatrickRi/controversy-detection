@@ -4,6 +4,7 @@ import random
 import networkx as nx
 import numpy as np
 from tqdm import tqdm
+from scipy import sparse
 
 
 def construct_H(g: nx.Graph, number_nodes: int, logger) -> nx.Graph:
@@ -30,10 +31,11 @@ def perform_random_walk(starting_node: int, adj) -> int:
         starting_node = neighbors[random_num]
 
 
-def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarray:
+def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger):
     logger.info('Performing random walks')
     gnn = g.number_of_nodes()
-    Q = np.zeros((gnn, gnn))
+    Qs = sparse.dok_matrix((g.number_of_nodes(), g.number_of_nodes()))
+    #Q = np.zeros((gnn, gnn))
     adj_map = H.adj  # faster for degree
     for i in tqdm(range(iterations)):
         for n in g:
@@ -41,9 +43,12 @@ def random_walk_Q(H: nx.Graph, g: nx.Graph, iterations: int, logger) -> np.ndarr
             for itr in range(node_itrs):
                 end = perform_random_walk(n, adj_map)
                 end = end - gnn
-                Q[n, end] = Q[n, end] + 1 / node_itrs
-    Q = Q / iterations
-    return Q
+                Qs[n, end] = Qs[n, end] + 1 / node_itrs
+                #Q[n, end] = Q[n, end] + 1 / node_itrs
+    #Q = Q / iterations
+    Qs = Qs / iterations
+    #return Q
+    return Qs
 
 
 def get_probability_matrix(g: nx.Graph, dataset: str, iterations: int, number_nodes: int, logger,
@@ -55,5 +60,5 @@ def get_probability_matrix(g: nx.Graph, dataset: str, iterations: int, number_no
     else:
         H = construct_H(g, number_nodes, logger)
         Q = random_walk_Q(H, g, iterations, logger)
-        np.save(target_path, Q)
+        #np.save(target_path, Q)
         return Q

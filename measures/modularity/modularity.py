@@ -28,7 +28,10 @@ class Modularity(Measure):
         self.logger.info('Start building membership')
         arr = np.zeros(self.graph.number_of_nodes())
         for n in self.right_part:
-            arr[n] = 1
+            try:
+                arr[n] = 1
+            except:
+                pass
         self.logger.info('Start reading gml')
         ig_g: ig.Graph = ig.read('../partitioning/datasets/'+self.dataset+'.gml')
         self.logger.info('Start calc Modularity')

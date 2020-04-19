@@ -36,14 +36,45 @@ class BCC(Measure):
         eb_list_all = self.replace_with_small(list(dict_edge_betweenness.values()))
         eb_list = self.replace_with_small(eb_list)
         self.logger.info('Calculate entropy')
-        entr = entropy(self.sample_from_kde(np.array(eb_list)), self.sample_from_kde(np.array(eb_list_all)))
-        return 1 - np.exp(-1.0 * entr)[0]
+
+        # eb_list_np = np.zeros(5)
+        # for i in range(5):
+        #     eb_list_np[i] = self.sample_from_kde(np.array(eb_list)).mean()
+        # eb_list_all_np = np.zeros(5)
+        # for i in range(5):
+        #     eb_list_all_np[i] = self.sample_from_kde(np.array(eb_list_all)).mean()
+        # print('{:.15f}'.format(eb_list_np.mean()))
+        # print('{:.15f}'.format(eb_list_np.std()))
+        # print('{:.15f}'.format(eb_list_all_np.mean()))
+        # print('{:.15f}'.format(eb_list_all_np.std()))
+        #
+        # entr = entropy(self.sample_from_kde(np.array(eb_list)), self.sample_from_kde(np.array(eb_list_all)))
+        # print('{:.15f}'.format(entr[0]))
+        # print('{:.15f}'.format(entropy(self.sample_from_kde(np.array(eb_list_all)), self.sample_from_kde(np.array(eb_list)))[0]))
+        # print('{:.15f}'.format(
+        #     entropy(self.sample_from_kde(np.array(eb_list) * 10000000),
+        #             self.sample_from_kde(np.array(eb_list_all) * 10000000))[0]))
+        # print('{:.15f}'.format(
+        #     entropy(self.sample_from_kde(np.array(eb_list_all)*10000000), self.sample_from_kde(np.array(eb_list)*10000000))[0]))
+        # return 1 - np.exp(-1.0 * entr)[0]
+        entropies = np.zeros(1)
+        for i in range(1):
+            np.savetxt('karate_eb_list.txt', eb_list, fmt='%f')
+            np.savetxt('karate_eb_list_all.txt', eb_list_all, fmt='%f')
+            eb_list_all_sampled = self.sample_from_kde(np.array(eb_list_all) * 10000)
+            eb_list_sampled = self.sample_from_kde(np.array(eb_list) * 10000)
+            entr = entropy(eb_list_all_sampled, eb_list_sampled)
+            print(self.dataset, "  - Entropy:", entr, "Means:", eb_list_all_sampled.mean(), eb_list_sampled.mean())
+            entropies[i] = 1 - np.exp(-1.0 * entr)[0]
+        print(self.dataset, " - alt Entropy:", 1 - np.exp(-1.0 * entropy(eb_list_sampled, eb_list_all_sampled))[0])
+        print(self.dataset, " - alt exp Entropy:", 1 - np.exp(-1.0 * entropy(np.exp(eb_list_sampled), np.exp(eb_list_all_sampled)))[0])
+        return entropies.mean()
 
     def replace_with_small(self, arr):
         result = []
         for x in arr:
-            if x < 0.000001:
-                result.append(0.000001)
+            if x < 0.000000001:
+                result.append(0.000000001)
             else:
                 result.append(x)
         return result

@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import networkx as nx
 import csv
+import numpy as np
 
 following = nx.DiGraph()
 ignoring = nx.DiGraph()
@@ -34,9 +35,21 @@ for k, v in graphs.items():
 
 # check if necessary
 #
+def print_statistics(k, g):
+    print("statistics for ", k)
+    print("nodes: ", g.number_of_nodes())
+    print("edges: ", g.number_of_edges())
+    degrees = []
+    for node in g.nodes():
+        degrees.append(g.degree(node))
+    df = pd.DataFrame(data=degrees, dtype=np.int)
+    print(df.describe())
+    print("\r\n")
+
 
 #     # additionally generate a second dataset, containing only the connected component
 for k, g in graphs.items():
+    print_statistics(k, g)
     ccs = list(nx.weakly_connected_components(g))
     if len(ccs) > 1:
         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]

@@ -14,9 +14,12 @@ for file in files:
         elements = line.split(',')
         G.add_edge(elements[0], elements[1])
     dataset = os.path.basename(file).split('.')[0]
-    nx.write_gml(G, './result/' + str(dataset) + '.gml')
+    #nx.write_gml(G, './result/' + str(dataset) + '.gml')
 
     # additionally generate a second dataset, containing only the connected component
+    print(dataset)
+    print("nodes: ", G.number_of_nodes())
+    print("edges: ", G.number_of_edges())
     ccs = list(nx.connected_components(G))
     if len(ccs) > 1:
         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
@@ -25,4 +28,4 @@ for file in files:
               '% of the dataset')
         largest_cc = max(ccs, key=len)
         S = G.subgraph(largest_cc).copy()
-        nx.write_gml(S, './result/' + str(dataset) + '_cc.gml')
+        #nx.write_gml(S, './result/' + str(dataset) + '_cc.gml')

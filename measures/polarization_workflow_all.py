@@ -39,25 +39,29 @@ def process_file(file):
 
     left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
     logger.info('finished loading partitions')
-
-    if g.number_of_nodes() < 100:
-        percent = 0.1
-    elif g.number_of_nodes() < 1000:
-        percent = 0.03
-    elif g.number_of_nodes() < 10000:
-        percent = 0.01
-    else:
-        percent = 0.001
+    nn = g.number_of_nodes()
+    percent = 0.02
+    iterations = 500
+    if nn >= 10000:
+        percent_n = 2000 * 0.02 + 8000 * 0.01 + (nn - 10000) * 0.005
+        percent = percent_n / nn
+        iterations = 10000
+    elif nn >= 2000:
+        percent_n = 2000 * 0.02 + (nn-2000) * 0.01
+        percent = percent_n/nn
+        iterations = 2000
     cache = config['cache']
     measures_list: List[Measure] = [
-        BCC(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
-        BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-        ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
-        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
-        PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=cache),
-        MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=cache),
-        Modularity(g, node_mapping, left_part, right_part, dataset_name),
-        RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
+        #BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
+        #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
+        #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
+        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='fa', plot=True),
+        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', plot=True),
+        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', metric='correlation', plot=True),
+        #PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=False),
+        #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=False),
+        #Modularity(g, node_mapping, left_part, right_part, dataset_name),
+        #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent, iterations=iterations),
     ]
     result_arr = []
     for m in measures_list:
@@ -73,7 +77,7 @@ def process_file(file):
             line.append(duration)
             result_arr.append(line)
             logger.info('Result for ' + m.__class__.__name__ + ' and dataset ' + dataset_name + ': ' + str(result))
-        except Exception as e:
+        except BaseException as e:
             print('ERROR at', m.__class__.__name__, 'and dataset', dataset_name, str(e))
             traceback.print_tb(e.__traceback__)
     logger.info('RESULT:' + str(result_arr))
@@ -85,17 +89,28 @@ if __name__ == '__main__':
     arr = []
     config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
     files = glob.glob(os.path.join(config['dataset-path'], '*.gml'))
-    files = [f for f in files if 'NY_Teams' not in f]
+    #files = [f for f in files if 'NY_Teams_Twitter_cc.gml' in f]
+    #files = [f for f in files if '_cc' in f and 'NY' not in f]
+    #files = [f for f in files if 'karate' in f]
+    def inList(f):
+        ff = str(f).lower()
+        #l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'ny_teams_twitter_cc', 'polblogs_cc']
+        l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'polblogs_cc']
+        for ll in l:
+            if ll in ff:
+                return True
+        return False
+    files = [f for f in files if inList(f)]
     # for f in files:
     #     if 'NY_Teams' in f:
     #         files.remove(f)
-    p = Pool(5)
+    p = Pool(4)
     res = p.map(process_file, files) #list(reversed(files))
     df = pd.DataFrame(data=[], columns=['dataset', 'measure', 'result', 'duration'])
     for l in res:
         for ll in l:
             df.loc[len(df)] = ll
     df.index.name = 'idx'
-    df.to_csv(r'output' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv')
+    df.to_csv(r'output_performanceForStripplot_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv')
     print(res)
 

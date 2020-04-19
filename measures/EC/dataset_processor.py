@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from typing import Dict, List
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import seaborn as sns
@@ -23,21 +22,22 @@ def read_positions_file(path: str) -> Dict[int, List[float]]:
     return dict_positions
 
 
-def create_file(g, target_path, embedding, partition, dataset, plot) -> Dict[int, List[float]]:
+def create_file(g, target_path, embedding, n_neighbors, metric, partition, dataset, plot) -> Dict[int, List[float]]:
     print('start partitioning')
     start = datetime.now()
     if embedding == 'fa':
         positions = force_atlas_fa2(g, 100)
     else:
-        positions = umap_ec(g, partition)
+        positions = umap_ec(g, partition, n_neighbors, metric)
     if plot:
         embeddinga = []
         embeddingb = []
         for i in list(positions.values()):
             embeddinga.append(i[0])
             embeddingb.append(i[1])
-        plt.scatter(embeddinga, embeddingb, c=[sns.color_palette()[x] for x in partition])
-        plt.savefig(dataset + '_' + embedding + '.png')
+        plt.scatter(embeddinga, embeddingb, s=1, c=[sns.color_palette()[x] for x in partition])
+        plt.savefig(embedding + '_' + str(n_neighbors) + '_' + metric + '_'+ dataset + '_' + embedding + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.png', dpi=500)
+        plt.close()
     print('end partitioning', 'took:', (datetime.now() - start).seconds, 'seconds')
     with open(target_path, 'w') as f:
         for keys in positions.keys():
@@ -45,11 +45,11 @@ def create_file(g, target_path, embedding, partition, dataset, plot) -> Dict[int
     return positions
 
 
-def get_positions(g: nx.Graph, dataset: str, cache: bool, embedding: str, partition, plot: bool) -> Dict[
+def get_positions(g: nx.Graph, dataset: str, cache: bool, embedding: str, n_neighbors: int, metric: str, partition, plot: bool) -> Dict[
     int, List[float]]:
     target_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'positions',
                                dataset + '_positions_ ' + embedding + '.txt')
     if os.path.exists(target_path) and cache:
         return read_positions_file(target_path)
     else:
-        return create_file(g, target_path, embedding, partition, dataset, plot)
+        return create_file(g, target_path, embedding, n_neighbors, metric, partition, dataset, plot)
