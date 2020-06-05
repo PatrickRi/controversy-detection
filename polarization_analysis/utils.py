@@ -13,7 +13,7 @@ import pymetis
 import os
 
 
-def postings_df_to_graph(df: pd.DataFrame, logger):
+def postings_df_to_graph(df: pd.DataFrame, logger, min_weight):
     graph = nx.DiGraph()
     # dictionary of postings and their authors
     posting_dictionary = {}  # Posting -> CommunityIdentity
@@ -43,6 +43,14 @@ def postings_df_to_graph(df: pd.DataFrame, logger):
                 graph[comm_ident][parent_ci]['weight'] = graph[comm_ident][parent_ci]['weight'] + 1
             else:
                 graph.add_edge(comm_ident, parent_ci, weight=1)
+    to_be_removed=[]
+    for edge in graph.edges:
+        if graph[edge[0]][edge[1]]['weight'] < min_weight:
+            to_be_removed.append(edge)
+    logger.info('Number of to be removed edges ' + str(len(to_be_removed)) + ' which is ' + str(
+        (len(to_be_removed) / graph.number_of_edges()) * 100) + '% of all edges')
+    for edge in to_be_removed:
+        graph.remove_edge(edge[0], edge[1])
     ccs = list(nx.weakly_connected_components(graph))
     if len(ccs) > 1:
         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
@@ -74,9 +82,9 @@ def normalize(graph):
     return g, node_mapping
 
 
-def fetch_sql(query, docid, index_col, logger, target_path):
+def fetch_sql(query, docid, index_col, logger, target_path, sql_cache):
     target = os.path.join(target_path, 'sql_result.pkl')
-    if os.path.exists(target):
+    if os.path.exists(target) and sql_cache:
         logger.info('Reading query from cache')
         return pd.read_pickle(target)
     else:

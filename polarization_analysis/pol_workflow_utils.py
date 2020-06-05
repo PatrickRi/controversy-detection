@@ -22,20 +22,24 @@ from polarization_analysis.utils import postings_df_to_graph, partition, normali
 pd.set_option('display.max_colwidth', -1)
 pd.set_option('display.max_columns', None)
 
-def calc_polarization(doc_id, query, id_col, type, measures=None):
+def calc_polarization(doc_id, query, id_col, type, experiment_name, measures=None, sql_cache=True, graph_cache=True, min_weight=1):
     logger = get_logger('main')
+    logger.info('curr doc id: ' + doc_id)
     target_path = os.path.join('cache', type, doc_id)
     if not os.path.exists(target_path):
         os.makedirs(target_path)
     ### fetch data
     # noinspection SqlNoDataSourceInspection
-    df = fetch_sql(query, doc_id, id_col, logger, target_path)
+    df = fetch_sql(query, doc_id, id_col, logger, target_path, sql_cache)
     ### parse data into network_cc
-
-    graph = postings_df_to_graph(df, logger)
-    gml_target = os.path.join(target_path, doc_id + '.gml')
-    nx.write_gml(graph, gml_target)
-    iggraph: ig.Graph = ig.read(gml_target)
+    gml_target = os.path.join(target_path, doc_id + '_' + experiment_name + '.gml')
+    if os.path.exists(gml_target) and graph_cache:
+        graph = nx.read_gml(gml_target, label='id')
+        iggraph = ig.read(gml_target)
+    else:
+        graph = postings_df_to_graph(df, logger, min_weight)
+        nx.write_gml(graph, gml_target)
+        iggraph: ig.Graph = ig.read(gml_target)
     ### partition
     g, node_mapping = normalize(graph)
     left_part, right_part = partition(g, target_path, doc_id)
@@ -57,11 +61,7 @@ def calc_polarization(doc_id, query, id_col, type, measures=None):
     else:
         measures_list = [measures_dict[m] for m in measures]
     df = calc_measures_n_times_async(measures_list, 10, logger)
-    df.to_csv(os.path.join(target_path, 'output_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv'))
-    #print(df)
-    df_stats = df[['measure', 'result']].groupby('measure').describe()
-    df_stats.to_csv(os.path.join(target_path, 'stats_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv'))
+    df.to_csv(os.path.join(target_path, 'output_' + experiment_name + '_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv'))
     df_stats_flattened = df[['measure', 'result']].groupby('measure').describe().unstack().reset_index()
-    df_stats_flattened.to_csv(os.path.join(target_path, 'stats_flattended_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv'))
-    #print(df_stats)
+    df_stats_flattened.to_csv(os.path.join(target_path, 'stats_flattended_' + experiment_name + '_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv'))
     return df_stats_flattened

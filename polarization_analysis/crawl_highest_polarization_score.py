@@ -23,6 +23,7 @@ from polarization_analysis.utils import postings_df_to_graph, partition, normali
 from polarization_analysis.pol_workflow_utils import calc_polarization
 
 pd.set_option('display.max_colwidth', -1)
+pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
 
 if __name__ == '__main__':
@@ -33,11 +34,16 @@ if __name__ == '__main__':
     measures_list = [
         "BCC", "BoundaryConnectivity", "EmbeddingControversy", "MBLB", "Modularity", "PolarizationIndex", "RWC"
     ]
-    df_posting_count = pd.read_csv('postings_per_article.csv', sep=';', names=['docid', 'cnt', 'title'], index_col='docid')
-    for (docid,cnt) in df_posting_count['cnt'].iteritems():
+    df_posting_count = pd.read_csv('postings_per_article.csv', sep=';', names=['docid', 'cnt', 'title'],
+                                   index_col='docid')
+    for (docid, cnt) in df_posting_count['cnt'].iteritems():
+        if not os.path.exists(os.path.join('cache', 'postings', str(docid))):
+            break
         query = template.substitute(docid=docid)
-        df_stats_flattened = calc_polarization(str(docid), query, 'ID_Posting', 'postings', measures=measures_list)
+        df_stats_flattened = calc_polarization(str(docid), query, 'ID_Posting', 'postings', 'min_2_weight',
+                                               measures=measures_list, sql_cache=True, graph_cache=True, min_weight=2)
         for m in measures_list:
-            a = df_stats_flattened.loc[(df_stats_flattened['level_1'] == 'mean' ) & (df_stats_flattened['measure'] == m)]
+            a = df_stats_flattened.loc[(df_stats_flattened['level_1'] == 'mean') & (df_stats_flattened['measure'] == m)]
             a['level_0'] = str(docid)
-            print(a.to_string(index=False, header=False))
+            with open("results_postings_min_2_weight.txt", "a") as myfile:
+                myfile.write(a.to_string(index=False, header=False) + "\r\n")
