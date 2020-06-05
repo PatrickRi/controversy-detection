@@ -16,7 +16,7 @@ from measures.MBLB import MBLB
 from measures.measure import Measure
 from measures.modularity import Modularity
 from measures.RWC import RWC
-from measures.utils import get_config, get_logger, get_partitions, normalize_graph
+from measures.utils import get_config, get_logger, get_partitions, normalize_graph, get_node_percentage
 
 
 def process_file(file):
@@ -39,17 +39,7 @@ def process_file(file):
 
     left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
     logger.info('finished loading partitions')
-    nn = g.number_of_nodes()
-    percent = 0.02
-    iterations = 500
-    if nn >= 10000:
-        percent_n = 2000 * 0.02 + 8000 * 0.01 + (nn - 10000) * 0.005
-        percent = percent_n / nn
-        iterations = 10000
-    elif nn >= 2000:
-        percent_n = 2000 * 0.02 + (nn-2000) * 0.01
-        percent = percent_n/nn
-        iterations = 2000
+    percent = get_node_percentage(g.number_of_nodes())
     cache = config['cache']
     measures_list: List[Measure] = [
         #BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),

@@ -9,9 +9,9 @@ import os
 
 class Modularity(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  algorithm: str = "newman"):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, True)
         self.algorithm = algorithm
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
@@ -33,9 +33,8 @@ class Modularity(Measure):
             except:
                 pass
         self.logger.info('Start reading gml')
-        ig_g: ig.Graph = ig.read('../partitioning/datasets/'+self.dataset+'.gml')
         self.logger.info('Start calc Modularity')
-        r = ig_g.modularity(membership=arr)
+        r = self.iggraph.modularity(membership=arr)
         self.logger.info('Finished calc Modularity')
         return r
 

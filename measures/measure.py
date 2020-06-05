@@ -1,14 +1,16 @@
 from abc import ABCMeta, abstractmethod
 import networkx as nx
 from .utils import get_logger
+import igraph as ig
 
 
 class Measure(metaclass=ABCMeta):
 
     @abstractmethod
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: list, right_part: list, dataset: str,
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: list, right_part: list, dataset: str,
                  cache: bool = True):
         self.graph = graph
+        self.iggraph = iggraph
         self.node_mapping = node_mapping
         self.left_part = left_part
         self.right_part = right_part

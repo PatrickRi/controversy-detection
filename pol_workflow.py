@@ -5,7 +5,7 @@ import pyodbc
 import numpy as np
 from string import Template
 import pymetis
-from partitioning.create_partitions import metis_to_nodelist, to_adjacency_list, write_nodelist_file
+from partitioning.partition_utils import metis_to_nodelist, to_adjacency_list, write_nodelist_file
 from measures.BCC import BCC
 from measures.CC import ClusteringCoefficient
 from measures.EC import EmbeddingControversy

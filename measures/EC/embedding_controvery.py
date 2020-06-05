@@ -1,6 +1,6 @@
 import math
 from typing import Dict, List
-
+import igraph as ig
 import networkx as nx
 import numpy as np
 
@@ -10,9 +10,9 @@ from .dataset_processor import get_positions
 
 class EmbeddingControversy(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 embedding: str = 'fa', n_neighbors: int = 30, metric: str = 'euclidean', plot: bool = False, cache: bool = True):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+                 embedding: str = 'fa', n_neighbors: int = 15, metric: str = 'euclidean', plot: bool = False, cache: bool = True):
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.embedding = embedding
         self.plot = plot
         self.n_neighbors = n_neighbors

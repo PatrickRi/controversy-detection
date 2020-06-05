@@ -63,3 +63,13 @@ def __read_partition_file(path: str) -> List[int]:
         line = int(line.strip())
         nodes.append(line)
     return nodes
+
+def get_node_percentage(number_of_nodes: int):
+    percent = 0.02
+    if number_of_nodes >= 10000:
+        percent_n = 2000 * 0.02 + 8000 * 0.01 + (number_of_nodes - 10000) * 0.005
+        percent = percent_n / number_of_nodes
+    elif number_of_nodes >= 2000:
+        percent_n = 2000 * 0.02 + (number_of_nodes - 2000) * 0.01
+        percent = percent_n / number_of_nodes
+    return percent

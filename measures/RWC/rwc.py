@@ -6,13 +6,14 @@ import networkx as nx
 from .rwc_utils import get_nodes_with_highest_degree
 from ..utils import list_to_dict
 from tqdm import tqdm
+import igraph as ig
 
 
 class RWC(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  percent: float = 0.10, iterations: int = 10000):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, True)
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, True)
         self.percent = percent
         self.iterations = iterations
 

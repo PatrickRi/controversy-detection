@@ -1,5 +1,5 @@
 from typing import List
-
+import igraph as ig
 import networkx as nx
 import numpy as np
 from scipy.stats import entropy
@@ -12,16 +12,16 @@ from ..utils import list_to_dict
 
 class BCC(Measure):
 
-    def __init__(self, graph: nx.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 cache: bool = True, bandwidth: float = 0.0000001):
-        super().__init__(graph, node_mapping, left_part, right_part, dataset, cache)
+    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int],
+                 right_part: List[int], dataset: str, cache: bool = True, bandwidth: float = 0.0000001):
+        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.bandwidth = bandwidth
         self.left_dict = list_to_dict(self.left_part)
         self.right_dict = list_to_dict(self.right_part)
 
     def calculate(self) -> float:
         self.logger.info('Retrieve centralities')
-        dict_edge_betweenness = get_centralities(self.graph, self.dataset, self.cache)
+        dict_edge_betweenness = get_centralities(self.graph, self.iggraph, self.dataset, self.cache)
 
         self.logger.info('Split lists')
         eb_list = []
@@ -59,15 +59,15 @@ class BCC(Measure):
         # return 1 - np.exp(-1.0 * entr)[0]
         entropies = np.zeros(1)
         for i in range(1):
-            np.savetxt('karate_eb_list.txt', eb_list, fmt='%f')
-            np.savetxt('karate_eb_list_all.txt', eb_list_all, fmt='%f')
+            # np.savetxt('karate_eb_list.txt', eb_list, fmt='%f')
+            # np.savetxt('karate_eb_list_all.txt', eb_list_all, fmt='%f')
             eb_list_all_sampled = self.sample_from_kde(np.array(eb_list_all) * 10000)
             eb_list_sampled = self.sample_from_kde(np.array(eb_list) * 10000)
             entr = entropy(eb_list_all_sampled, eb_list_sampled)
-            print(self.dataset, "  - Entropy:", entr, "Means:", eb_list_all_sampled.mean(), eb_list_sampled.mean())
+            # print(self.dataset, "  - Entropy:", entr, "Means:", eb_list_all_sampled.mean(), eb_list_sampled.mean())
             entropies[i] = 1 - np.exp(-1.0 * entr)[0]
-        print(self.dataset, " - alt Entropy:", 1 - np.exp(-1.0 * entropy(eb_list_sampled, eb_list_all_sampled))[0])
-        print(self.dataset, " - alt exp Entropy:", 1 - np.exp(-1.0 * entropy(np.exp(eb_list_sampled), np.exp(eb_list_all_sampled)))[0])
+        # print(self.dataset, " - alt Entropy:", 1 - np.exp(-1.0 * entropy(eb_list_sampled, eb_list_all_sampled))[0])
+        # print(self.dataset, " - alt exp Entropy:", 1 - np.exp(-1.0 * entropy(np.exp(eb_list_sampled), np.exp(eb_list_all_sampled)))[0])
         return entropies.mean()
 
     def replace_with_small(self, arr):

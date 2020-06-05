@@ -12,16 +12,18 @@ from measures.measure import Measure
 from measures.modularity import Modularity
 from measures.PI import PolarizationIndex
 from measures.RWC import RWC
-from measures.utils import get_config, get_logger, get_partitions, normalize_graph
+import igraph as ig
+from measures.utils import get_config, get_logger, get_partitions, normalize_graph, get_node_percentage
 
 logger = get_logger('main')
 
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'connected_complete_graphs'#'gun_control_Twitter_cc'#'connected_complete_graphs'#'Facebook_Friends_cc' #NY_Teams_Twitter_cc #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter_cc'
+dataset_name = 'karate'#'gun_control_Twitter_cc'#'connected_complete_graphs'#'Facebook_Friends_cc' #NY_Teams_Twitter_cc #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter_cc'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
+iggraph: ig.Graph = ig.read(os.path.join(config['dataset-path'], dataset_name + '.gml'))
 logger.info('finished reading gml')
 # partitions are normalized too, therefore necessary to achieve matching
 # only necessary if input doesn't start from 0
@@ -39,28 +41,20 @@ logger.info('finished normalizing')
 left_part, right_part = get_partitions(config['partition'], config['partitions-path'], dataset_name)
 logger.info('finished loading partitions')
 arr = []
-nn=g.number_of_nodes()
-percent = 0.02
-if nn >= 10000:
-    percent_n = 2000 * 0.02 + 8000 * 0.01 + (nn - 10000) * 0.005
-    percent = percent_n / nn
-elif nn >= 2000:
-    percent_n = 2000 * 0.02 + (nn-2000) * 0.01
-    percent = percent_n/nn
+percent = get_node_percentage(g.number_of_nodes())
 
 measures_list: List[Measure] = [
-    BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-    BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-    BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-    BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-    #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-    #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
-    #EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, embedding='umap', cache=False, plot=True),
-    #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent),
-    #Modularity(g, node_mapping, left_part, right_part, dataset_name),
-    #PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-    #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent)
-
+    BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    BoundaryConnectivity(g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    ClusteringCoefficient(g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    EmbeddingControversy(g, iggraph, node_mapping, left_part, right_part, dataset_name, embedding='umap', cache=False, plot=False),
+    MBLB(g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent),
+    Modularity(g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    PolarizationIndex(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    RWC(g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent)
 ]
 for i in range(1):
     for m in measures_list:
