@@ -45,9 +45,9 @@ def process_file(file):
         #BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
         #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
         #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
-        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='fa', plot=True),
-        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', plot=True),
-        EmbeddingControversy(g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', metric='correlation', plot=True),
+        EmbeddingControversy('EC', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='fa', plot=True),
+        EmbeddingControversy('ECU', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', plot=True),
+        EmbeddingControversy('ECU(corr)', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', metric='correlation', plot=True),
         #PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=False),
         #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=False),
         #Modularity(g, node_mapping, left_part, right_part, dataset_name),
@@ -58,17 +58,17 @@ def process_file(file):
         try:
             line = []
             line.append(dataset_name)
-            logger.info('Calculating ' + m.__class__.__name__ + ' for %s', dataset_name)
+            logger.info('Calculating ' + m.name + ' for %s', dataset_name)
             start = datetime.now()
             result = m.calculate()
             duration = (datetime.now() - start).seconds
-            line.append(m.__class__.__name__)
+            line.append(m.name)
             line.append(result)
             line.append(duration)
             result_arr.append(line)
-            logger.info('Result for ' + m.__class__.__name__ + ' and dataset ' + dataset_name + ': ' + str(result))
+            logger.info('Result for ' + m.name + ' and dataset ' + dataset_name + ': ' + str(result))
         except BaseException as e:
-            print('ERROR at', m.__class__.__name__, 'and dataset', dataset_name, str(e))
+            print('ERROR at', m.name, 'and dataset', dataset_name, str(e))
             traceback.print_tb(e.__traceback__)
     logger.info('RESULT:' + str(result_arr))
     return result_arr

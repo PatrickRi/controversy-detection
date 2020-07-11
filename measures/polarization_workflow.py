@@ -44,23 +44,23 @@ arr = []
 percent = get_node_percentage(g.number_of_nodes())
 
 measures_list: List[Measure] = [
-    BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    BCC('BCC', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
     # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
     # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
     # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
-    BoundaryConnectivity(g, iggraph, node_mapping, left_part, right_part, dataset_name),
-    ClusteringCoefficient(g, iggraph, node_mapping, left_part, right_part, dataset_name),
-    EmbeddingControversy(g, iggraph, node_mapping, left_part, right_part, dataset_name, embedding='umap', cache=False, plot=False),
-    MBLB(g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent),
-    Modularity(g, iggraph, node_mapping, left_part, right_part, dataset_name),
-    PolarizationIndex(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
-    RWC(g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent)
+    BoundaryConnectivity('BC', g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    ClusteringCoefficient('CC', g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    EmbeddingControversy('ECU', g, iggraph, node_mapping, left_part, right_part, dataset_name, embedding='umap', cache=False, plot=False),
+    MBLB('MBLB', g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent),
+    Modularity('Modularity', g, iggraph, node_mapping, left_part, right_part, dataset_name),
+    PolarizationIndex('PI', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+    RWC('RWC', g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent)
 ]
 for i in range(1):
     for m in measures_list:
 
-        logger.info('Start calculating %s', m.__class__.__name__)
-        result = m.__class__.__name__, m.calculate()
+        logger.info('Start calculating %s', m.name)
+        result = m.name, m.calculate()
         arr.append(result)
         print(result)
 print(arr)

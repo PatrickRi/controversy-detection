@@ -2,4 +2,5 @@
 /Datasets
 /**/*.npy
 measures/EC/positions
+measures/BCC/edge_betweenness
 measures/MBLB/enriched_datasets

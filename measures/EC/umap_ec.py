@@ -9,4 +9,5 @@ def umap_ec(g: nx.Graph, s, n_neighbors, metric) -> Dict[int, List[float]]:
     # using the partitioning vector as target, leads to extreme results (information leak)
     #embedding = reducer.fit_transform(nx.to_numpy_array(g), s)
     embedding = reducer.fit_transform(nx.to_numpy_array(g))
+    del reducer
     return dict(zip(g.nodes(), embedding))

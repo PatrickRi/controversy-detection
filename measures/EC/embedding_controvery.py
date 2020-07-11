@@ -10,20 +10,21 @@ from .dataset_processor import get_positions
 
 class EmbeddingControversy(Measure):
 
-    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
-                 embedding: str = 'fa', n_neighbors: int = 15, metric: str = 'euclidean', plot: bool = False, cache: bool = True):
-        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
+    def __init__(self, name: str, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+                 embedding: str = 'fa', n_neighbors: int = 15, metric: str = 'euclidean', plot: bool = False, cache: bool = True, plot_target_path: str = ''):
+        super().__init__(name, graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.embedding = embedding
         self.plot = plot
         self.n_neighbors = n_neighbors
         self.metric = metric
+        self.plot_target_path = plot_target_path
 
     def calculate(self) -> float:
         self.logger.info('Fetch positions')
         partition = np.zeros(self.graph.number_of_nodes(), dtype='int')
         for n in self.left_part:
             partition[n] = 1
-        dict_positions = get_positions(self.graph, self.dataset, self.cache, self.embedding, self.n_neighbors, self.metric, partition, self.plot)
+        dict_positions = get_positions(self.graph, self.dataset, self.cache, self.embedding, self.n_neighbors, self.metric, partition, self.plot, self.plot_target_path)
         # calculate dx and dy and dxy
         self.logger.info('Calculate distance left-left')
         avg_left_left = self.calc_avg_distance(self.left_part, self.left_part, dict_positions)

@@ -10,9 +10,9 @@ from .dataset_processor import get_dataset_with_ideologies
 
 class MBLB(Measure):
 
-    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+    def __init__(self, name:str, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  percent: float = 0.05, cache: bool = True):
-        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
+        super().__init__(name, graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.percent = percent
 
     def calculate(self) -> float:

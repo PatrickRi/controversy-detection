@@ -6,8 +6,10 @@ from urllib.parse import urlencode
 import pyodbc
 import networkx as nx
 import pandas as pd
+from typing import List
 import numpy as np
 from measures.utils import normalize_graph
+from measures.measure import Measure
 from partitioning.partition_utils import metis_to_nodelist, to_adjacency_list, write_nodelist_file
 import pymetis
 import os
@@ -112,19 +114,19 @@ def write_name_file(docid, target_path):
         open(os.path.join(target_path, title + '.txt'), 'a').close()
 
 
-def calc_measures(measures_list, logger):
+def calc_measures(measures_list: List[Measure], logger):
     arr =[]
     for m in measures_list:
         try:
             line=[]
-            logger.info('Calculating ' + m.__class__.__name__)
+            logger.info('Calculating ' + m.name)
             result = m.calculate()
-            line.append(m.__class__.__name__)
+            line.append(m.name)
             line.append(result)
             arr.append(line)
-            logger.info('Result for ' + m.__class__.__name__ + ': ' + str(result))
+            logger.info('Result for ' + m.name + ': ' + str(result))
         except Exception as e:
-            print('ERROR at', m.__class__.__name__)
+            print('ERROR at', m.name)
     return arr
 
 def calc_measures_n_times(measures_list, times, logger):

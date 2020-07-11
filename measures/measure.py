@@ -7,8 +7,9 @@ import igraph as ig
 class Measure(metaclass=ABCMeta):
 
     @abstractmethod
-    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: list, right_part: list, dataset: str,
+    def __init__(self, name: str, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: list, right_part: list, dataset: str,
                  cache: bool = True):
+        self.name = name
         self.graph = graph
         self.iggraph = iggraph
         self.node_mapping = node_mapping

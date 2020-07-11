@@ -10,9 +10,9 @@ from ..utils import list_to_dict
 
 class PolarizationIndex(Measure):
 
-    def __init__(self, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
+    def __init__(self, name: str, graph: nx.Graph, iggraph: ig.Graph, node_mapping: dict, left_part: List[int], right_part: List[int], dataset: str,
                  iterations: int = 500, cache: bool = True):
-        super().__init__(graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
+        super().__init__(name, graph, iggraph, node_mapping, left_part, right_part, dataset, cache)
         self.left_dict = list_to_dict(left_part)
         self.right_dict = list_to_dict(right_part)
         self.number_nodes = self.graph.number_of_nodes()
