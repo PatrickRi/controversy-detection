@@ -1,22 +1,23 @@
 import glob
 import os
+import traceback
+from datetime import datetime
 from multiprocessing import Pool
 from typing import List
-import pandas as pd
-from datetime import datetime
-import numpy as np
+
+import igraph as ig
 import networkx as nx
-import traceback
-from measures.PI import PolarizationIndex
+import pandas as pd
+
 from measures.BCC import BCC
 from measures.EC import EmbeddingControversy
 from measures.GMCK import BoundaryConnectivity
-from measures.CC import ClusteringCoefficient
 from measures.MBLB import MBLB
 from measures.measure import Measure
 from measures.modularity import Modularity
+from measures.PI import PolarizationIndex
 from measures.RWC import RWC
-from measures.utils import get_config, get_logger, get_partitions, normalize_graph, get_node_percentage
+from measures.utils import get_config, get_logger, get_node_percentage, get_partitions, normalize_graph
 
 
 def process_file(file):
@@ -25,6 +26,7 @@ def process_file(file):
     logger.info('Start processing %s', dataset_name)
     logger.info('start reading gml')
     graph_from_file = nx.read_gml(file, label='id')
+    iggraph: ig.Graph = ig.read(file)
     logger.info('finished reading gml')
     # partitions are normalized too, therefore necessary to achieve matching
     config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
@@ -42,16 +44,20 @@ def process_file(file):
     percent = get_node_percentage(g.number_of_nodes())
     cache = config['cache']
     measures_list: List[Measure] = [
-        #BCC(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-        #BoundaryConnectivity(g, node_mapping, left_part, right_part, dataset_name),
-        #ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
-        EmbeddingControversy('EC', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='fa', plot=True),
-        EmbeddingControversy('ECU', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', plot=True),
-        EmbeddingControversy('ECU(corr)', g, node_mapping, left_part, right_part, dataset_name, cache=False, embedding='umap', metric='correlation', plot=True),
-        #PolarizationIndex(g, node_mapping, left_part, right_part, dataset_name, cache=False),
-        #MBLB(g, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=False),
-        #Modularity(g, node_mapping, left_part, right_part, dataset_name),
-        #RWC(g, node_mapping, left_part, right_part, dataset_name, percent=percent, iterations=iterations),
+        # BCC('BCC', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+        # BoundaryConnectivity('BC', g, iggraph, node_mapping, left_part, right_part, dataset_name),
+        # ClusteringCoefficient(g, node_mapping, left_part, right_part, dataset_name),
+        EmbeddingControversy('EC', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False,
+                             embedding='fa', plot=True),
+        EmbeddingControversy('ECU', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False,
+                             embedding='umap', plot=True, n_neighbors=30),
+        EmbeddingControversy('ECU(corr)', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False,
+                             embedding='umap', metric='correlation', plot=True),
+        # PolarizationIndex('PI', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
+        # MBLB('MBLB', g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent, cache=False),
+        # Modularity('Modularity', g, iggraph, node_mapping, left_part, right_part, dataset_name),
+        RWC('RWC', g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent,
+            iterations=1000),
     ]
     result_arr = []
     for m in measures_list:
@@ -79,28 +85,33 @@ if __name__ == '__main__':
     arr = []
     config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
     files = glob.glob(os.path.join(config['dataset-path'], '*.gml'))
-    #files = [f for f in files if 'NY_Teams_Twitter_cc.gml' in f]
-    #files = [f for f in files if '_cc' in f and 'NY' not in f]
-    #files = [f for f in files if 'karate' in f]
+
+
+    # files = [f for f in files if 'NY_Teams_Twitter_cc.gml' in f]
+    # files = [f for f in files if '_cc' in f and 'NY' not in f]
+    # files = [f for f in files if 'karate' in f]
     def inList(f):
         ff = str(f).lower()
-        #l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'ny_teams_twitter_cc', 'polblogs_cc']
-        l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'polblogs_cc']
+        # l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'ny_teams_twitter_cc', 'polblogs_cc']
+        # l = ['cruzeiro_atletico_twitter_cc', 'complete_graph_600', 'karate', 'connected_complete_graphs', 'gun_control_twitter_cc', 'facebook_friends_cc', 'polblogs_cc']
+        l = ['follow_ignore_cc', 'following_cc', 'ignoring_cc']
+        # l = ['follow_ignore_cc']
         for ll in l:
             if ll in ff:
                 return True
         return False
+
+
     files = [f for f in files if inList(f)]
     # for f in files:
     #     if 'NY_Teams' in f:
     #         files.remove(f)
-    p = Pool(4)
-    res = p.map(process_file, files) #list(reversed(files))
+    p = Pool(1)
+    res = p.map(process_file, files)  # list(reversed(files))
     df = pd.DataFrame(data=[], columns=['dataset', 'measure', 'result', 'duration'])
     for l in res:
         for ll in l:
             df.loc[len(df)] = ll
     df.index.name = 'idx'
-    df.to_csv(r'output_performanceForStripplot_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv')
+    df.to_csv(r'community_connection_' + datetime.now().strftime("%m-%d-%Y-%H%M%S") + '.csv')
     print(res)
-

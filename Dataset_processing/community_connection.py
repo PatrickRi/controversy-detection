@@ -50,7 +50,8 @@ def print_statistics(k, g):
 #     # additionally generate a second dataset, containing only the connected component
 for k, g in graphs.items():
     print_statistics(k, g)
-    ccs = list(nx.weakly_connected_components(g))
+    g = g.to_undirected()
+    ccs = list(nx.connected_components(g))
     if len(ccs) > 1:
         lengths = [len(c) for c in sorted(ccs, key=len, reverse=True)]
         print('Creating second dataset for', k, 'containing only the largest CC')

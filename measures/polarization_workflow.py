@@ -20,7 +20,7 @@ logger = get_logger('main')
 config = get_config(os.path.join(os.getcwd(), 'config.yaml'))
 
 # dataset_name = config['dataset-name']
-dataset_name = 'karate'#'gun_control_Twitter_cc'#'connected_complete_graphs'#'Facebook_Friends_cc' #NY_Teams_Twitter_cc #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter_cc'
+dataset_name = 'connected_complete_graphs'#'gun_control_Twitter_cc'#'connected_complete_graphs'#'Facebook_Friends_cc' #NY_Teams_Twitter_cc #'NY_Teams_Twitter_cc'  # 'Cruzeiro_Atletico_Twitter_cc'
 logger.info('start reading gml')
 graph_from_file: nx.Graph = nx.read_gml(os.path.join(config['dataset-path'], dataset_name + '.gml'), label='id')
 iggraph: ig.Graph = ig.read(os.path.join(config['dataset-path'], dataset_name + '.gml'))
@@ -45,11 +45,7 @@ percent = get_node_percentage(g.number_of_nodes())
 
 measures_list: List[Measure] = [
     BCC('BCC', g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
-    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
-    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
-    # BCC(g, iggraph, node_mapping, left_part, right_part, dataset_name, cache=False),
     BoundaryConnectivity('BC', g, iggraph, node_mapping, left_part, right_part, dataset_name),
-    ClusteringCoefficient('CC', g, iggraph, node_mapping, left_part, right_part, dataset_name),
     EmbeddingControversy('ECU', g, iggraph, node_mapping, left_part, right_part, dataset_name, embedding='umap', cache=False, plot=False),
     MBLB('MBLB', g, iggraph, node_mapping, left_part, right_part, dataset_name, percent=percent),
     Modularity('Modularity', g, iggraph, node_mapping, left_part, right_part, dataset_name),
